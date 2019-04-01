@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "eslint \"src/**/*.{js,vue}\"",
+    "lint-fix": " eslint \"src/**/*.{js,vue}\" --fix"
   },
   "dependencies": {
     "core-js": "^2.6.5",
@@ -43,6 +44,7 @@
       "SharedArrayBuffer": "readonly"
     },
     "rules": {
+      "no-undef": 0,
       "vue/html-indent": 1,
       "vue/require-v-for-key": 0,
       "vue/require-default-prop": 0,

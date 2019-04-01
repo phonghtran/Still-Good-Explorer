@@ -1,17 +1,17 @@
 <template>
   <div class="container">
     <div class="row">
-    <div class="col-3">
+      <div class="col-3">
 
 
-      <ul>
-        <li v-for="(item,date) in playlists">
+        <ul>
+          <li v-for="(item,date) in playlists">
 
-          <router-link :to="{ path: 'home', query: { playlist: date }}">{{date}}</router-link>
-        </li>
-      </ul>
-    </div>
-      <div class="col-9" v-if="this.$route.query.playlist">
+            <router-link :to="{ path: 'home', query: { playlist: date }}">{{date}}</router-link>
+          </li>
+        </ul>
+      </div>
+      <div v-if="this.$route.query.playlist" class="col-9">
         <div class="is-sticky">
           {{targetPlaylist}}
           <ul>
@@ -32,8 +32,8 @@
 </template>
 
 <script>
-  const playlists = require('../services/playlists.json');
-  const songs = require('../services/songs.json');
+
+  import { mapState } from "vuex";
 
   export default {
     name: 'HelloWorld',
@@ -42,14 +42,17 @@
     },
     data() {
       return {
-        playlists: playlists,
-        songs: songs
-      }
+
+      };
     },
     computed: {
+      ...mapState([
+        'songs',
+        'playlists'
+      ]),
       targetPlaylist: function(){
         if (this.$route.query.playlist){
-          return this.playlists[this.$route.query.playlist]
+          return this.playlists[this.$route.query.playlist];
         }
 
         return null;
@@ -60,7 +63,7 @@
         return value.replace(/\\'/, "'");
       }
     }
-  }
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
