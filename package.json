@@ -11,7 +11,10 @@
     "core-js": "^2.6.5",
     "vue": "^2.6.6",
     "vue-router": "^3.0.1",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "axios": "latest",
+    "bootstrap": "latest",
+    "bootstrap-vue": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",
@@ -28,15 +31,38 @@
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true
+      "browser": true,
+      "es6": true
     },
     "extends": [
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+    },
+    "rules": {
+      "vue/html-indent": 1,
+      "vue/require-v-for-key": 0,
+      "vue/require-default-prop": 0,
+      "vue/v-bind-style": 0,
+      "vue/no-unused-components": 0,
+      "vue/attribute-hyphenation": 0,
+      "vue/html-self-closing": 0,
+      "vue/name-property-casing": 0,
+      "vue/require-prop-types": 0,
+      "vue/prop-name-casing": 0,
+      "semi": 1,
+      "vue/attributes-order": 2
+    },
+    "plugins": [
+      "vue"
+    ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "ecmaVersion": 2018,
+      "parser": "babel-eslint",
+      "sourceType": "module"
     }
   },
   "postcss": {

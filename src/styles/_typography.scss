@@ -1,0 +1,33 @@
+* {
+	font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+}
+
+h1 {
+	line-height: 2rem;
+
+}
+
+h2 {
+
+}
+
+p {
+
+	margin-bottom: space(5);
+}
+
+a,
+a:not([href]),
+a:not([href]):not([tabindex]) {
+	color: $dark;
+	cursor: pointer;
+	display: block;
+	font-weight: bold;
+	padding: 5px;
+	text-decoration: underline;
+
+	&:hover {
+		color: $medium;
+
+	}
+}
