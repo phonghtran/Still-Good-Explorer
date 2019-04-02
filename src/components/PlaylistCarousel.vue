@@ -1,20 +1,8 @@
 <template>
   <div>
     <canvas class="canvas"></canvas>
-    <div class="timelineContainer">
-      <div class="timeline">
-        <button v-for="(date,key) in playlistDates"
-                v-bind:style="{'top': msBetweenDates(date) + '%'}"
-                v-bind:class="{'active': (timelineActiveButton===key)}"
-                @mouseenter="populateToolTip(date, true, msBetweenDates(date))"
-                @mouseleave="populateToolTip('', false, 0)"
-                @click="goto('pl' + date, key)">
-
-        </button>
-      </div>
-      <div class="tooltip" v-bind:class="{active: tooltipIsVisible}" v-bind:style="{'top': tooltipPos}">
-        {{tooltipText}}
-      </div>
+    <div class="timelineContainer d-flex justify-content-center">
+      <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
     </div>
 
     <div class="d-flex align-items-start">
@@ -26,11 +14,11 @@
             v-for="item in playlist"
             v-bind:class="{'song': true, 'active': (selectedTrack===item.trackID)}"
             v-bind:trackID="item.trackID"
-            @click="selectTrack(item.trackID)"
+            @mouseenter="selectTrack(item.trackID)"
           >
 
 
-            <span class="artist" v-html="item.artist"></span> &nbsp;
+            <span class="artist" v-html="item.artist"></span>
             <span class="name" v-html="item.name"></span>
           </li>
         </ol>
@@ -55,9 +43,8 @@
         tooltipText: '',
         timelineActiveButton: 0,
         selectedTrack: null,
-        playlistPositions: [],
         trackColors: {},
-        lineShimmer: 0,
+        lineShimmer: 0.5,
       };
     },
     computed: {
@@ -68,7 +55,33 @@
       ...mapGetters([
         'playlistDates',
         'playlistDurations'
-      ])
+      ]),
+      playlistPositions: function () {
+        const playlists = document.querySelectorAll('.playlist');
+
+        let newArray = [];
+        playlists.forEach(function (currentPlaylist) {
+          newArray.push(currentPlaylist.offsetLeft);
+        });
+
+        return newArray;
+      },
+      buttonDates: function () {
+        let newArray = [];
+
+        let prevYear = '';
+
+        for (let playlist in this.playlists){
+          const thisYear = moment(playlist).format('YYYY');
+
+          if (thisYear !== prevYear){
+            prevYear = thisYear;
+            newArray.push(thisYear);
+          }
+        }
+
+        return newArray;
+      }
     },
     created: function () {
       window.addEventListener('scroll', this.handleScroll);
@@ -78,14 +91,8 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const playlists = document.querySelectorAll('.playlist');
 
-      let newArray = [];
-      playlists.forEach(function (currentPlaylist) {
-        newArray.push(currentPlaylist.offsetLeft);
-      });
-
-      this.playlistPositions = newArray;
+      this.handleScroll();
     },
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll);
@@ -101,12 +108,20 @@
         this.tooltipText = dateString;
         this.tooltipPos = position * 0.6 + (position * 0.3) + '%';
       },
-      goto(refName, activeButton) {
-        const element = document.getElementById(refName);
-        const pos = element.offsetTop - 100;
-        window.scrollTo(0, pos);
+      scrollTo(targetDate) {
 
-        this.timelineActiveButton = activeButton;
+        const playlists = document.querySelectorAll('.playlist');
+
+        for (let index = 0; index < playlists.length ; index++) {
+          console.log(playlists[index].getAttribute('id').indexOf(targetDate));
+          if (playlists[index].getAttribute('id').indexOf(targetDate) !== -1){
+
+            window.scrollTo(playlists[index].offsetLeft - 100, 0);
+            break;
+          }
+        }
+
+
       },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
@@ -129,18 +144,22 @@
         let visibleIndices = [];
         let currentIndex = 0;
         for (let pos of this.playlistPositions) {
-          if (pos > w.x && pos + (w.w / 3) < w.x + w.w) {
+          if (pos > w.x - w.w * 0.5 && pos + (w.w / 3) < w.x + w.w * 1.5) {
             visibleIndices.push(currentIndex);
           }
 
           currentIndex++;
         }
 
-        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
-        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
-        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
-        visibleIndices.unshift(visibleIndices[0] - 1);
-        visibleIndices.unshift(visibleIndices[0] - 1);
+        for (let padLoop = 0; padLoop < 3; padLoop++) {
+          if (visibleIndices[visibleIndices.length - 1] < this.playlistPositions.length) {
+            visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
+          }
+
+          if (visibleIndices[0] > 0) {
+            visibleIndices.unshift(visibleIndices[0] - 1);
+          }
+        }
 
 
         for (let index = 0; index < visibleIndices.length - 2; index++) {
@@ -152,13 +171,12 @@
             const currentChildren = currentPlaylist.childNodes[1].childNodes;
             const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
 
-
             for (let i = 0; i < currentChildren.length; i++) {
               for (let j = 0; j < compareToChildren.length; j++) {
                 if (currentChildren[i].getAttribute('trackID') === compareToChildren[j].getAttribute('trackID')) {
                   const magicPadding = {
-                    x: 52,
-                    y: 12
+                    x: 53,
+                    y: 28
                   };
 
                   const origin = {
@@ -178,21 +196,29 @@
 
                   const bezier = {
                     x1: (distance.x * 0.16) + origin.x,
-                    y1: distance.y * 5,
+                    y1: distance.y * 3,
                     x2: (distance.x * 0.33) + origin.x,
                     y2: distance.y * 0.25,
                     x3: (distance.x * 0.50) + origin.x,
-                    y3: distance.y ,
-                    x4: (distance.x * 0.66) + origin.x,
+                    y3: distance.y,
+                    x4: (distance.x * 0.7) + origin.x,
                     y4: distance.y * 2,
                     x5: (distance.x * 0.83) + origin.x,
                     y5: distance.y * 0.125,
+                    x6: (distance.x * 0.9) + origin.x,
+                    y6: distance.y * 0.5,
+                    x7: (distance.x * 0.95) + origin.x,
+                    y7: distance.y * 0.9,
+                    x8: (distance.x * 0.98) + origin.x,
+                    y8: distance.y * 0.125,
                   };
 
-                  console.log(this.distanceFormula(target, origin));
+                  const isMoreThanNine = {
+                    current: (i > 9),
+                    compareTo: (j > 9)
+                  };
 
-
-                  this.renderBezier(currentChildren[i].getAttribute('trackID'), origin, target, bezier);
+                  this.renderBezier(currentChildren[i].getAttribute('trackID'), origin, target, bezier, isMoreThanNine);
 
                   break;
                 }
@@ -206,7 +232,7 @@
         return Math.abs(target.x - origin.x);
         //return Math.sqrt(((target.x - origin.x) ^ 2) + ((target.y - origin.y) ^ 2));
       },
-      renderBezier: function (trackID, origin, target, bezier) {
+      renderBezier: function (trackID, origin, target, bezier, isMoreThanNine) {
         const canvas = document.querySelector('.canvas');
         const ctx = canvas.getContext('2d');
 
@@ -221,18 +247,30 @@
           this.trackColors[trackID] = 'rgba(' + red + ', ' + green + ', ' + blue;
         }
 
-        this.lineShimmer += 0.03;
-        if (this.lineShimmer > 0.3){
+        this.lineShimmer += 0.01;
+        if (this.lineShimmer > 0.4) {
           this.lineShimmer = 0.1;
         }
-        ctx.strokeStyle = this.trackColors[trackID] + ', ' + this.lineShimmer + ')';
-        ctx.lineWidth = 2;
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = this.trackColors[trackID] + ', ' + (this.lineShimmer * 0.65) + ')';
         ctx.beginPath();
         ctx.moveTo(origin.x, origin.y);
-        ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, bezier.x3, bezier.y3,);
+        ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, bezier.x3, bezier.y3);
         ctx.stroke();
+
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = this.trackColors[trackID] + ', ' + (this.lineShimmer * 0.85) + ')';
+        ctx.beginPath();
         ctx.moveTo(bezier.x3, bezier.y3);
-        ctx.bezierCurveTo(bezier.x4, bezier.y4, bezier.x5, bezier.y5, target.x, target.y);
+        ctx.bezierCurveTo(bezier.x4, bezier.y4, bezier.x5, bezier.y5, bezier.x6, bezier.y6);
+        ctx.stroke();
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.trackColors[trackID] + ', ' + this.lineShimmer + ')';
+        ctx.beginPath();
+        ctx.moveTo(bezier.x6, bezier.y6);
+        ctx.bezierCurveTo(bezier.x7, bezier.y7, bezier.x8, bezier.y8, target.x, target.y);
         ctx.stroke();
 
         const radius = 16;
@@ -241,13 +279,22 @@
         ctx.lineWidth = 1;
         ctx.strokeStyle = this.trackColors[trackID] + ', 0.5)';
 
+        let nudge = 4;
+        if (isMoreThanNine.current === true){
+          nudge = 0;
+        }
+
         ctx.beginPath();
-        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.ellipse(origin.x + nudge, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
 
+        if (isMoreThanNine.compareTo === false){
+          nudge = 4;
+        }
+
         ctx.beginPath();
-        ctx.ellipse(target.x, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.ellipse(target.x + nudge, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
 
@@ -269,24 +316,42 @@
   }
 
   .playlist {
-    background-color: rgba($light, 0.25);
+    background-color: rgba($error, 0.05);
+    border: 2px solid rgba($error, 0.5);
     border-radius: $border-radius;
     margin: 0 map_get($spacers, 4);
     min-width: 33vw;
     padding: map_get($spacers, 5);
 
+    h4 {
+      text-align: right;
+    }
+
     ol {
       padding-left: map_get($spacers, 4);
 
       .song {
-        font-size: 1rem;
+        padding: map_get($spacers, 3) 0 map_get($spacers, 3) map_get($spacers, 3);
+        margin-bottom: map_get($spacers, 1);
 
         &.active {
           background-color: rgba($success, 0.25);
+          border-radius: $border-radius;
+        }
+
+        span {
+          display: block;
         }
 
         .artist {
+          /*font-weight: bold;*/
+        }
+
+        .name {
+          font-size: 1.5rem;
           font-weight: bold;
+          line-height: 1.5rem;
+
         }
       }
     }
@@ -295,11 +360,36 @@
 
 
   .timelineContainer {
-    bottom: 0;
+
+
     left: 0;
-    padding: map_get($spacers, 4) 0;
     position: fixed;
-    top: 3rem;
+    right: 0;
+    top: 4rem;
+
+
+     button {
+       background-color: $white;
+       border-bottom: 2px solid rgba($error, 0.5);
+       border-top: 2px solid rgba($error, 0.5);
+       padding: map_get($spacers, 2) map_get($spacers, 3);
+
+       &:hover {
+         background-color: lighten($light, 5%);
+       }
+
+
+       &:first-child {
+         border-left: 2px solid rgba($error, 0.5);
+         border-radius: $border-radius 0 0  $border-radius  ;
+       }
+
+       &:last-child {
+         border-right: 2px solid rgba($error, 0.5);
+         border-radius: 0 $border-radius  $border-radius  0;
+       }
+     }
+
 
 
     .timeline {
