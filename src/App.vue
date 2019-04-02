@@ -20,11 +20,13 @@
   #nav {
     background-color: $dark;
     color: $white;
+    font-size: 0.925rem;
     left: 0;
     padding: map_get($spacers, 2);
     position: fixed;
     top: 0;
     right: 0;
+    z-index: $zindex-sticky;
 
     a {
       color: $white;

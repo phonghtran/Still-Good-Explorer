@@ -4,8 +4,7 @@
     <p>Unique Playlists: {{getTotal(playlists)}}</p>
 
     <div v-for="(set,key) in songByAppearances">
-      <h2>{{key}}</h2>
-      {{getTotal(set)}}
+     {{getTotal(set)}} songs appeared {{key}}
 
 <!--      <ol>-->
 <!--        <li v-for="item in set">-->
@@ -14,13 +13,19 @@
 <!--      </ol>-->
     </div>
 
+    <div>
+      {{playlistDurations}}
+      {{playlistDates}}
+    </div>
+
   </div>
 </template>
 
 <script>
 
 
-  import {  mapState } from "vuex";
+  import { mapGetters, mapState } from "vuex";
+  import moment from 'moment'
 
   export default {
     name: 'StatsAnalysis',
@@ -37,6 +42,10 @@
         'songs',
         'playlists',
         'songByAppearances'
+      ]),
+      ...mapGetters([
+        'playlistDates',
+        'playlistDurations'
       ])
     },
     methods: {

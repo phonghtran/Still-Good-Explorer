@@ -15,7 +15,8 @@
     "vuex": "^3.0.1",
     "axios": "latest",
     "bootstrap": "latest",
-    "bootstrap-vue": "latest"
+    "bootstrap-vue": "latest",
+    "moment": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",

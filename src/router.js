@@ -14,7 +14,7 @@ export default new Router({
     {
       path: '/',
       name: 'index',
-      component: Stats
+      component: Playlists
     },
     {
       path: '/home',
