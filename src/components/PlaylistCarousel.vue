@@ -51,7 +51,10 @@
         tooltipText: '',
         timelineActiveButton: 0,
         selectedTrack: null,
-        playlistPositions: []
+        windowScroll: {
+          x: 0,
+          y: 0
+        }
       };
     },
     computed: {
@@ -71,17 +74,6 @@
       const canvas = document.querySelector('.canvas');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-
-      const selectedSongs = document.querySelectorAll('.playlist');
-
-      let newArray = [];
-      selectedSongs.forEach(function (userItem) {
-        newArray.push(userItem.offsetLeft);
-      });
-
-      this.playlistPositions = newArray;
-
-      console.log(this.playlistPositions);
     },
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll);
@@ -99,7 +91,6 @@
       },
       goto(refName, activeButton) {
         const element = document.getElementById(refName);
-        console.log(element);
         const pos = element.offsetTop - 100;
         window.scrollTo(0, pos);
 
@@ -107,44 +98,59 @@
       },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
+
         window.addEventListener('scroll', this.handleScroll);
+        this.renderLines();
       },
-      handleScroll(event) {
+      resetCanvas() {
+        const canvas = document.querySelector('.canvas');
+        const windowWidth = canvas.width = window.innerWidth;
+        const windowHeight = canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
 
+        ctx.clearRect(0, 0, windowWidth, windowHeight);
+      },
+      renderLines() {
+        const windowScroll = this.windowScroll;
+        const canvas = document.querySelector('.canvas');
+        const ctx = canvas.getContext('2d');
 
-        if (this.selectedTrack !== null) {
-          const canvas = document.querySelector('.canvas');
-          let windowWidth = canvas.width = window.innerWidth;
-          let windowHeight = canvas.height = window.innerHeight;
-          const scrollX = window.scrollX;
-          const ctx = canvas.getContext('2d');
-          const widthOfPlaylist = windowWidth * 0.33;;
+        this.resetCanvas();
 
-          // ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-          // ctx.fillRect(0, 0, windowWidth / 2, windowHeight /3);
+        const selectedSongs = document.querySelectorAll('.song.active');
+        selectedSongs.forEach(function (userItem, index) {
+          if (index > 0 && index < selectedSongs.length) {
+            const prevElem = selectedSongs[index - 1];
+            const origin = {
+              x: prevElem.offsetLeft + prevElem.offsetWidth - windowScroll.x,
+              y: prevElem.offsetTop + (prevElem.offsetHeight / 2) - windowScroll.y
+            };
+            const target = {
+              x: userItem.offsetLeft - windowScroll.x,
+              y: userItem.offsetTop + (userItem.offsetHeight / 2) - windowScroll.y
+            };
+            const bezier = {
+              x1: (Math.abs(target.x - origin.x) * 0.33) + origin.x,
+              x2: (Math.abs(target.x - origin.x) * 0.66) + origin.x,
+              y1: origin.y * 1.5,
+              y2: target.y * 0.5
+            };
 
-          const selectedSongs = document.querySelectorAll('.song.active');
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+            ctx.beginPath();
+            ctx.moveTo(origin.x, origin.y);
+            ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, target.x, target.y);
+            ctx.stroke();
+          }
+        });
+      },
+      handleScroll() {
+        this.windowScroll = {
+          x: window.scrollX,
+          y: window.scrollY
+        };
 
-          ctx.clearRect(0, 0, windowWidth, windowHeight);
-
-          selectedSongs.forEach(function (userItem) {
-            const elementX = userItem.offsetLeft;
-
-            console.log(elementX, widthOfPlaylist, 'window:', scrollX, windowWidth);
-
-            if (elementX + widthOfPlaylist > scrollX && elementX  <  windowWidth + scrollX) {
-
-
-              ctx.strokeStyle = 'rgba(255, 0, 0, 0.25)';
-              ctx.beginPath();       // Start a new path
-              ctx.moveTo(0, 0);    // Move the pen to (30, 50)
-              ctx.lineTo(elementX - scrollX , userItem.offsetTop);  // Draw a line to (150, 100)
-              ctx.stroke();          // Render the path
-            }
-          });
-
-        }
-
+        this.renderLines();
       }
     },
     filters: {}
