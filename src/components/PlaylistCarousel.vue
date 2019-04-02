@@ -27,8 +27,11 @@
             v-bind:class="{'song': true, 'active': (selectedTrack===item.trackID)}"
             v-bind:trackID="item.trackID"
             @click="selectTrack(item.trackID)"
-            v-html="item.trackID + ' ' +  item.artist + ' - ' + item.name">
+          >
 
+
+            <span class="artist" v-html="item.artist"></span> &nbsp;
+            <span class="name" v-html="item.name"></span>
           </li>
         </ol>
 
@@ -52,7 +55,9 @@
         tooltipText: '',
         timelineActiveButton: 0,
         selectedTrack: null,
-        playlistPositions: []
+        playlistPositions: [],
+        trackColors: {},
+        lineShimmer: 0,
       };
     },
     computed: {
@@ -132,17 +137,16 @@
         }
 
         visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
+        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
+        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
+        visibleIndices.unshift(visibleIndices[0] - 1);
         visibleIndices.unshift(visibleIndices[0] - 1);
 
-        console.log(visibleIndices);
 
         for (let index = 0; index < visibleIndices.length - 2; index++) {
-          const currentPlaylist = playlists[index];
-          const compareToPlaylist = playlists[index + 1];
-
-          // find array of songs of each
-          // loop inside loop
-          // if match draw bezier
+          const indexOffset = visibleIndices[index];
+          const currentPlaylist = playlists[indexOffset];
+          const compareToPlaylist = playlists[indexOffset + 1];
 
           if (currentPlaylist.hasChildNodes() && compareToPlaylist.hasChildNodes()) {
             const currentChildren = currentPlaylist.childNodes[1].childNodes;
@@ -152,24 +156,43 @@
             for (let i = 0; i < currentChildren.length; i++) {
               for (let j = 0; j < compareToChildren.length; j++) {
                 if (currentChildren[i].getAttribute('trackID') === compareToChildren[j].getAttribute('trackID')) {
-
+                  const magicPadding = {
+                    x: 52,
+                    y: 12
+                  };
 
                   const origin = {
-                    x: currentPlaylist.offsetLeft  ,
-                    y: currentChildren[i].offsetTop + (currentChildren[i].offsetHeight / 2)- w.y
+                    x: currentPlaylist.offsetLeft + magicPadding.x - w.x,
+                    y: currentChildren[i].offsetTop + magicPadding.y - w.y
                   };
                   const target = {
-                    x: compareToPlaylist.offsetLeft ,
-                    y: compareToChildren[j].offsetTop + (compareToChildren[j].offsetHeight / 2) - w.y
-                  };
-                  const bezier = {
-                    x1: (this.distanceFormula(target.x, origin.x) * 0.33) + origin.x,
-                    x2: (this.distanceFormula(target.x,  origin.x) * 0.66) + origin.x,
-                    y1: origin.y * 1.5,
-                    y2: target.y * 0.5
+                    x: compareToPlaylist.offsetLeft + magicPadding.x - w.x,
+                    y: compareToChildren[j].offsetTop + magicPadding.y - w.y
                   };
 
-                  this.renderBezier(origin, target, bezier);
+                  const distance = {
+                    x: this.distanceFormula(target, origin),
+                    y: Math.min(origin.y, target.y)
+
+                  };
+
+                  const bezier = {
+                    x1: (distance.x * 0.16) + origin.x,
+                    y1: distance.y * 5,
+                    x2: (distance.x * 0.33) + origin.x,
+                    y2: distance.y * 0.25,
+                    x3: (distance.x * 0.50) + origin.x,
+                    y3: distance.y ,
+                    x4: (distance.x * 0.66) + origin.x,
+                    y4: distance.y * 2,
+                    x5: (distance.x * 0.83) + origin.x,
+                    y5: distance.y * 0.125,
+                  };
+
+                  console.log(this.distanceFormula(target, origin));
+
+
+                  this.renderBezier(currentChildren[i].getAttribute('trackID'), origin, target, bezier);
 
                   break;
                 }
@@ -179,31 +202,55 @@
         }
 
       },
-      distanceFormula: function(x1, x2){
-        return Math.sqrt((x1 + x2) ^ 2);
+      distanceFormula: function (target, origin) {
+        return Math.abs(target.x - origin.x);
+        //return Math.sqrt(((target.x - origin.x) ^ 2) + ((target.y - origin.y) ^ 2));
       },
-      renderBezier: function (origin, target, bezier) {
+      renderBezier: function (trackID, origin, target, bezier) {
         const canvas = document.querySelector('.canvas');
         const ctx = canvas.getContext('2d');
 
-        console.log(origin.x, target.x);
+        if (!this.trackColors[trackID]) {
+          const threshold = 105;
+          const offset = 100;
 
-        const red = Math.floor(Math.random() * 255);
-        const green = Math.floor(Math.random() * 255);
-        const blue = Math.floor(Math.random() * 255);
+          const red = Math.floor(Math.random() * threshold + offset);
+          const green = Math.floor(Math.random() * threshold + offset * 0.25);
+          const blue = Math.floor(Math.random() * threshold + offset * 0.75);
 
-        ctx.strokeStyle = 'rgba(' + red + ', ' + green + ', ' + blue + ', 1)';
+          this.trackColors[trackID] = 'rgba(' + red + ', ' + green + ', ' + blue;
+        }
+
+        this.lineShimmer += 0.03;
+        if (this.lineShimmer > 0.3){
+          this.lineShimmer = 0.1;
+        }
+        ctx.strokeStyle = this.trackColors[trackID] + ', ' + this.lineShimmer + ')';
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(origin.x, origin.y);
-        ctx.lineTo(target.x, target.y);
-        // ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, target.x, target.y);
+        ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, bezier.x3, bezier.y3,);
         ctx.stroke();
+        ctx.moveTo(bezier.x3, bezier.y3);
+        ctx.bezierCurveTo(bezier.x4, bezier.y4, bezier.x5, bezier.y5, target.x, target.y);
+        ctx.stroke();
+
+        const radius = 16;
+
+        ctx.fillStyle = this.trackColors[trackID] + ', 0.25)';
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = this.trackColors[trackID] + ', 0.5)';
+
         ctx.beginPath();
-        ctx.ellipse(origin.x, origin.y, 10, 10, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fill();
         ctx.stroke();
+
         ctx.beginPath();
-        ctx.ellipse(target.x, target.y, 20, 20, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.ellipse(target.x, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fill();
         ctx.stroke();
+
       }
     },
     filters: {}
@@ -226,16 +273,20 @@
     border-radius: $border-radius;
     margin: 0 map_get($spacers, 4);
     min-width: 33vw;
-    padding: map_get($spacers, 4);
+    padding: map_get($spacers, 5);
 
     ol {
-      padding-left: map_get($spacers, 3);
+      padding-left: map_get($spacers, 4);
 
       .song {
-        font-size: 0.75rem;
+        font-size: 1rem;
 
         &.active {
           background-color: rgba($success, 0.25);
+        }
+
+        .artist {
+          font-weight: bold;
         }
       }
     }
