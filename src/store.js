@@ -19,7 +19,7 @@ export default new Vuex.Store({
       let datesArray = [];
 
       for (let pl in state.playlists){
-        datesArray.push(pl)
+        datesArray.push(pl);
       }
 
       datesArray.sort();

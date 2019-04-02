@@ -4,13 +4,18 @@
     <p>Unique Playlists: {{getTotal(playlists)}}</p>
 
     <div v-for="(set,key) in songByAppearances">
-     {{getTotal(set)}} songs appeared {{key}}
 
-<!--      <ol>-->
-<!--        <li v-for="item in set">-->
-<!--          {{item.name}} - {{item.artist}}-->
-<!--        </li>-->
-<!--      </ol>-->
+      {{getTotal(set)}} songs appeared {{key}}
+
+      <template v-if="key >= 10">
+        {{set}}
+      </template>
+
+      <!--      <ol>-->
+      <!--        <li v-for="item in set">-->
+      <!--          {{item.name}} - {{item.artist}}-->
+      <!--        </li>-->
+      <!--      </ol>-->
     </div>
 
     <div>
@@ -22,10 +27,8 @@
 </template>
 
 <script>
-
-
   import { mapGetters, mapState } from "vuex";
-  import moment from 'moment'
+
 
   export default {
     name: 'StatsAnalysis',
