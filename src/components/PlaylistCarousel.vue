@@ -25,6 +25,7 @@
           <li
             v-for="item in playlist"
             v-bind:class="{'song': true, 'active': (selectedTrack===item.trackID)}"
+            v-bind:trackID="item.trackID"
             @click="selectTrack(item.trackID)"
             v-html="item.trackID + ' ' +  item.artist + ' - ' + item.name">
 
@@ -51,10 +52,7 @@
         tooltipText: '',
         timelineActiveButton: 0,
         selectedTrack: null,
-        windowScroll: {
-          x: 0,
-          y: 0
-        }
+        playlistPositions: []
       };
     },
     computed: {
@@ -68,12 +66,21 @@
       ])
     },
     created: function () {
-
+      window.addEventListener('scroll', this.handleScroll);
     },
     mounted: function () {
       const canvas = document.querySelector('.canvas');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      const playlists = document.querySelectorAll('.playlist');
+
+      let newArray = [];
+      playlists.forEach(function (currentPlaylist) {
+        newArray.push(currentPlaylist.offsetLeft);
+      });
+
+      this.playlistPositions = newArray;
     },
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll);
@@ -98,59 +105,105 @@
       },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
-
-        window.addEventListener('scroll', this.handleScroll);
-        this.renderLines();
-      },
-      resetCanvas() {
-        const canvas = document.querySelector('.canvas');
-        const windowWidth = canvas.width = window.innerWidth;
-        const windowHeight = canvas.height = window.innerHeight;
-        const ctx = canvas.getContext('2d');
-
-        ctx.clearRect(0, 0, windowWidth, windowHeight);
-      },
-      renderLines() {
-        const windowScroll = this.windowScroll;
-        const canvas = document.querySelector('.canvas');
-        const ctx = canvas.getContext('2d');
-
-        this.resetCanvas();
-
-        const selectedSongs = document.querySelectorAll('.song.active');
-        selectedSongs.forEach(function (userItem, index) {
-          if (index > 0 && index < selectedSongs.length) {
-            const prevElem = selectedSongs[index - 1];
-            const origin = {
-              x: prevElem.offsetLeft + prevElem.offsetWidth - windowScroll.x,
-              y: prevElem.offsetTop + (prevElem.offsetHeight / 2) - windowScroll.y
-            };
-            const target = {
-              x: userItem.offsetLeft - windowScroll.x,
-              y: userItem.offsetTop + (userItem.offsetHeight / 2) - windowScroll.y
-            };
-            const bezier = {
-              x1: (Math.abs(target.x - origin.x) * 0.33) + origin.x,
-              x2: (Math.abs(target.x - origin.x) * 0.66) + origin.x,
-              y1: origin.y * 1.5,
-              y2: target.y * 0.5
-            };
-
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.beginPath();
-            ctx.moveTo(origin.x, origin.y);
-            ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, target.x, target.y);
-            ctx.stroke();
-          }
-        });
       },
       handleScroll() {
-        this.windowScroll = {
+        const w = {
           x: window.scrollX,
-          y: window.scrollY
+          y: window.scrollY,
+          w: window.innerWidth,
+          h: window.innerHeight
         };
 
-        this.renderLines();
+        const canvas = document.querySelector('.canvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, w.w, w.h);
+
+        const playlists = document.querySelectorAll('.playlist');
+
+        let visibleIndices = [];
+        let currentIndex = 0;
+        for (let pos of this.playlistPositions) {
+          if (pos > w.x && pos + (w.w / 3) < w.x + w.w) {
+            visibleIndices.push(currentIndex);
+          }
+
+          currentIndex++;
+        }
+
+        visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
+        visibleIndices.unshift(visibleIndices[0] - 1);
+
+        console.log(visibleIndices);
+
+        for (let index = 0; index < visibleIndices.length - 2; index++) {
+          const currentPlaylist = playlists[index];
+          const compareToPlaylist = playlists[index + 1];
+
+          // find array of songs of each
+          // loop inside loop
+          // if match draw bezier
+
+          if (currentPlaylist.hasChildNodes() && compareToPlaylist.hasChildNodes()) {
+            const currentChildren = currentPlaylist.childNodes[1].childNodes;
+            const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
+
+
+            for (let i = 0; i < currentChildren.length; i++) {
+              for (let j = 0; j < compareToChildren.length; j++) {
+                if (currentChildren[i].getAttribute('trackID') === compareToChildren[j].getAttribute('trackID')) {
+
+
+                  const origin = {
+                    x: currentPlaylist.offsetLeft  ,
+                    y: currentChildren[i].offsetTop + (currentChildren[i].offsetHeight / 2)- w.y
+                  };
+                  const target = {
+                    x: compareToPlaylist.offsetLeft ,
+                    y: compareToChildren[j].offsetTop + (compareToChildren[j].offsetHeight / 2) - w.y
+                  };
+                  const bezier = {
+                    x1: (this.distanceFormula(target.x, origin.x) * 0.33) + origin.x,
+                    x2: (this.distanceFormula(target.x,  origin.x) * 0.66) + origin.x,
+                    y1: origin.y * 1.5,
+                    y2: target.y * 0.5
+                  };
+
+                  this.renderBezier(origin, target, bezier);
+
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+      },
+      distanceFormula: function(x1, x2){
+        return Math.sqrt((x1 + x2) ^ 2);
+      },
+      renderBezier: function (origin, target, bezier) {
+        const canvas = document.querySelector('.canvas');
+        const ctx = canvas.getContext('2d');
+
+        console.log(origin.x, target.x);
+
+        const red = Math.floor(Math.random() * 255);
+        const green = Math.floor(Math.random() * 255);
+        const blue = Math.floor(Math.random() * 255);
+
+        ctx.strokeStyle = 'rgba(' + red + ', ' + green + ', ' + blue + ', 1)';
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(target.x, target.y);
+        // ctx.bezierCurveTo(bezier.x1, bezier.y1, bezier.x2, bezier.y2, target.x, target.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(origin.x, origin.y, 10, 10, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(target.x, target.y, 20, 20, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.stroke();
       }
     },
     filters: {}
