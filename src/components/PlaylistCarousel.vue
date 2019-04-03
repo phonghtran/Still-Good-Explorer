@@ -5,7 +5,7 @@
       <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
     </div>
 
-    <div class="d-flex align-items-start">
+    <div class="playlistContainer__wrapper d-flex align-items-start">
       <div v-for="(playlist, key) in playlists" v-bind:id="'pl'+key" class="playlist">
 
         <h4>{{key}}</h4>
@@ -113,7 +113,7 @@
         const playlists = document.querySelectorAll('.playlist');
 
         for (let index = 0; index < playlists.length ; index++) {
-          console.log(playlists[index].getAttribute('id').indexOf(targetDate));
+
           if (playlists[index].getAttribute('id').indexOf(targetDate) !== -1){
 
             window.scrollTo(playlists[index].offsetLeft - 100, 0);
@@ -308,6 +308,10 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
+  .playlistContainer__wrapper {
+    margin-top: map_get($spacers, 6);
+  }
+
   .canvas {
     left: 0;
     position: fixed;
@@ -320,8 +324,9 @@
     border: 2px solid rgba($error, 0.5);
     border-radius: $border-radius;
     margin: 0 map_get($spacers, 4);
-    min-width: 33vw;
+    min-width: 98vw;
     padding: map_get($spacers, 5);
+
 
     h4 {
       text-align: right;
@@ -331,8 +336,8 @@
       padding-left: map_get($spacers, 4);
 
       .song {
-        padding: map_get($spacers, 3) 0 map_get($spacers, 3) map_get($spacers, 3);
-        margin-bottom: map_get($spacers, 1);
+        padding: map_get($spacers, 2)  map_get($spacers, 2) ;
+        margin-bottom: 0;
 
         &.active {
           background-color: rgba($success, 0.25);
@@ -344,13 +349,13 @@
         }
 
         .artist {
-          /*font-weight: bold;*/
+          font-size: 0.875rem;
         }
 
         .name {
-          font-size: 1.5rem;
+          font-size: 1rem;
           font-weight: bold;
-          line-height: 1.5rem;
+          line-height: 1rem;
 
         }
       }
@@ -430,6 +435,32 @@
 
       &.active {
         display: block;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    .playlist {
+      min-width: 33vw;
+
+      ol {
+
+
+        .song {
+          padding: map_get($spacers, 3) 0 map_get($spacers, 3);
+          margin-bottom: map_get($spacers, 1);
+
+
+          .artist {
+            font-size: 1rem;
+          }
+          .name {
+            font-size: 1.5rem;
+
+            line-height: 1.5rem;
+
+          }
+        }
       }
     }
   }
