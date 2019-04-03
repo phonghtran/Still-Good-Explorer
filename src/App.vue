@@ -16,7 +16,7 @@
   }
 
   #nav {
-    background-color: $dark;
+    background-color: $error;
     color: $white;
     font-size: 0.925rem;
     left: 0;
@@ -28,6 +28,8 @@
 
     a {
       color: $white;
+      font-weight: normal;
+      text-decoration: none;
     }
   }
 </style>
