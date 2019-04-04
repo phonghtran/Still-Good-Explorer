@@ -5,6 +5,7 @@
       <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
     </div>
 
+
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
       <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlist">
 
@@ -45,8 +46,7 @@
     props: {},
     data() {
       return {
-        selectedTrack: null,
-        trackColors: {}
+        selectedTrack: null
       };
     },
     computed: {
@@ -65,6 +65,42 @@
         playlists.forEach(function (currentPlaylist) {
           newArray.push(currentPlaylist.offsetLeft);
         });
+
+        return newArray;
+      },
+      playlistMatches: function (){
+        let newArray = {};
+        const keys = Object.keys(this.playlists);
+        const maxLength = keys.length;
+
+        let currentIndex = 0;
+        let compareToIndex = 0;
+
+        for (let index = 0; index < maxLength - 1; index++){
+          const currentPlaylist = this.playlists[keys[index]];
+          const compareToPlaylist = this.playlists[keys[index + 1]];
+
+          currentIndex = 0;
+
+
+          newArray[keys[index]] = [];
+
+          for (let currrentSong in currentPlaylist){
+            compareToIndex = 0;
+
+            for (let compareToSong in compareToPlaylist){
+              if (currentPlaylist[currrentSong].trackID === compareToPlaylist[compareToSong].trackID){
+                newArray[keys[index]].push([currentIndex, compareToIndex]);
+
+                break;
+              }
+
+              compareToIndex++;
+            }
+
+            currentIndex++;
+          }
+        }
 
         return newArray;
       },
@@ -118,17 +154,15 @@
       }
     },
     created: function () {
-      window.addEventListener('scroll', this.handleScroll);
-    }
-    ,
+
+    },
     mounted: function () {
-      this.handleScroll();
-    }
-    ,
+      window.addEventListener('scroll', this.handleScroll );
+
+    },
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll);
-    }
-    ,
+    },
     methods: {
       scrollTo(targetDate) {
         const playlists = document.querySelectorAll('.playlist');
@@ -156,9 +190,14 @@
           g: Math.floor(Math.random() * threshold + offset * 0.25),
           b: Math.floor(Math.random() * threshold + offset * 0.75)
         };
-      }
-      ,
-      handleScroll() {
+      },
+      resetCanvas: function (){
+        const canvas = document.querySelector('.canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
         const w = {
           x: window.scrollX,
           y: window.scrollY,
@@ -166,105 +205,91 @@
           h: window.innerHeight
         };
 
-        const canvas = document.querySelector('.canvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         ctx.clearRect(0, 0, w.w, w.h);
+      },
+      handleScroll: function (){
+        const w = {
+          x: window.scrollX,
+          y: window.scrollY,
+          w: window.innerWidth,
+          h: window.innerHeight
+        };
+
+        this.resetCanvas();
 
         const playlists = document.querySelectorAll('.playlist');
 
-        let visibleIndices = [];
         let currentIndex = 0;
-        for (let pos of this.playlistPositions) {
-          if (pos > w.x - w.w * 0.5 && pos + (w.w / 3) < w.x + w.w * 1.5) {
-            visibleIndices.push(currentIndex);
-          }
+        for (let i = 0; i < this.playlistPositions.length - 1; i++) {
+          const pos = this.playlistPositions[i];
+
+          if (pos > w.x - w.w * 0.5 && pos + (w.w / 3) < w.x + w.w * 2) {
+
+
+            const currentPlaylist = playlists[currentIndex];
+            const compareToPlaylist = playlists[currentIndex + 1];
+
+            const currentDate = currentPlaylist.getAttribute('date');
+
+            const checkMatches = this.playlistMatches[currentDate];
+
+
+            const colors = {
+              origin: this.playlistStyle[currentDate],
+              target: this.playlistStyle[compareToPlaylist.getAttribute('date')]
+            };
+
+            if (currentPlaylist.hasChildNodes() && compareToPlaylist.hasChildNodes()) {
+              const currentChildren = currentPlaylist.childNodes[1].childNodes;
+              const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
+
+              for (let currentMatch in checkMatches) {
+                const magicPadding = {
+                  x: 53,
+                  y: 28
+                };
+
+                const currentSongIndex = checkMatches[currentMatch][0];
+                const compareToSongIndex = checkMatches[currentMatch][1];
+
+
+                const origin = {
+                  x: currentPlaylist.offsetLeft + currentPlaylist.offsetWidth - w.x,
+                  y: currentChildren[currentSongIndex].offsetTop + magicPadding.y - w.y
+                };
+                const target = {
+                  x: compareToPlaylist.offsetLeft - w.x,
+                  y: compareToChildren[compareToSongIndex].offsetTop + magicPadding.y - w.y
+                };
+
+                this.renderBezier(currentChildren[currentSongIndex].getAttribute('trackID'), origin, target, colors);
+
+              } // each match / song
+            } // if list has nodes
+          } // if is in the window view
 
           currentIndex++;
-        }
-
-        for (let padLoop = 0; padLoop < 3; padLoop++) {
-          if (visibleIndices[visibleIndices.length - 1] < this.playlistPositions.length) {
-            visibleIndices.push(visibleIndices[visibleIndices.length - 1] + 1);
-          }
-
-          if (visibleIndices[0] > 0) {
-            visibleIndices.unshift(visibleIndices[0] - 1);
-          }
-        }
-
-        for (let index = 0; index < visibleIndices.length - 2; index++) {
-          const indexOffset = visibleIndices[index];
-          const currentPlaylist = playlists[indexOffset];
-          const compareToPlaylist = playlists[indexOffset + 1];
-
-          const colors = {
-            origin: this.playlistStyle[currentPlaylist.getAttribute('date')],
-            target: this.playlistStyle[compareToPlaylist.getAttribute('date')]
-          };
-
-          if (currentPlaylist.hasChildNodes() && compareToPlaylist.hasChildNodes()) {
-            const currentChildren = currentPlaylist.childNodes[1].childNodes;
-            const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
-
-            for (let i = 0; i < currentChildren.length; i++) {
-              for (let j = 0; j < compareToChildren.length; j++) {
-                if (currentChildren[i].getAttribute('trackID') === compareToChildren[j].getAttribute('trackID')) {
-                  const magicPadding = {
-                    x: 53,
-                    y: 28
-                  };
-
-                  const origin = {
-                    x: currentPlaylist.offsetLeft + currentPlaylist.offsetWidth - w.x,
-                    y: currentChildren[i].offsetTop + magicPadding.y - w.y
-                  };
-                  const target = {
-                    x: compareToPlaylist.offsetLeft - w.x,
-                    y: compareToChildren[j].offsetTop + magicPadding.y - w.y
-                  };
-
-                  this.renderBezier(currentChildren[i].getAttribute('trackID'), origin, target, colors);
-
-                  break;
-                }
-              }
-            }
-          }
-        }
-
-      }
-      ,
+        } // check each playlist offset left
+      },
       renderBezier: function (trackID, origin, target, colors) {
         const canvas = document.querySelector('.canvas');
         const ctx = canvas.getContext('2d');
 
-        if (!this.trackColors[trackID]) {
-          const colors = this.generateColor();
-
-          this.trackColors[trackID] = 'rgba(' + colors.r + ', ' + colors.g + ', ' + colors.b;
-        }
-
-        const originColor = 'rgba(' + colors.origin.original.color.r + ', ' + colors.origin.original.color.g + ', ' + colors.origin.original.color.b;
-        const targetColor = 'rgba(' + colors.target.original.color.r + ', ' + colors.target.original.color.g + ', ' + colors.target.original.color.b;
-
         const radius = 8;
 
-        ctx.fillStyle = originColor + ', 1)';
+        ctx.strokeStyle = colors.origin.tint;
+        ctx.fillStyle = colors.origin.color;
         ctx.beginPath();
-        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI * 2, Math.PI * 1.5, Math.PI / 2);
+        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();
 
 
         const gradient = ctx.createLinearGradient(origin.x + radius, origin.y, target.x - radius, target.y);
 
-        gradient.addColorStop(0, originColor);
-        gradient.addColorStop(1, targetColor);
+        gradient.addColorStop(0, colors.origin.tint);
+        gradient.addColorStop(1, colors.target.tint);
 
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.strokeStyle = gradient;
         ctx.beginPath();
         ctx.moveTo(origin.x, origin.y);
@@ -273,12 +298,12 @@
         ctx.lineTo(target.x - radius, target.y);
         ctx.stroke();
 
-        ctx.fillStyle = targetColor + ', 1)';
+        ctx.strokeStyle = colors.target.tint;
+        ctx.fillStyle = colors.target.color;
         ctx.beginPath();
-        ctx.moveTo(target.x - radius * 2, target.y - radius);
-        ctx.lineTo(target.x - radius * 2, target.y + radius);
-        ctx.lineTo(target.x, target.y);
+        ctx.ellipse(target.x, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();
+        ctx.stroke();
       }
     }
     ,
