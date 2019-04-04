@@ -157,6 +157,7 @@
 
     },
     mounted: function () {
+      this.handleScroll();
       window.addEventListener('scroll', this.handleScroll );
 
     },
@@ -366,7 +367,7 @@
 
 
         &.active {
-          background-color: $white;
+          background-color: rgba($white, 0.85);
           color: $black;
 
         }
