@@ -6,20 +6,28 @@ import Stats from './views/Stats.vue';
 
 Vue.use(Router);
 
-export default new Router({
+
+
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
       name: 'index',
-      component: Playlists
+      component: Playlists,
+      meta: {
+        title: 'Home'
+      }
     },
 
     {
       path: '/playlists',
       name: 'playlists',
-      component: Playlists
+      component: Playlists,
+      meta: {
+        title: 'Playlists'
+      }
     },
     {
       path: '/stats',
@@ -29,3 +37,15 @@ export default new Router({
 
   ]
 });
+
+const DEFAULT_TITLE = 'Still Good Explorer';
+router.afterEach((to) => {
+  let prefix = '';
+  if (to.meta.title ){
+    prefix = to.meta.title + ' | ';
+  }
+  document.title = prefix + DEFAULT_TITLE;
+});
+
+export default router;
+
