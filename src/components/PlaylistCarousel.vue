@@ -277,13 +277,6 @@
 
         const radius = 8;
 
-        ctx.strokeStyle = colors.origin.tint;
-        ctx.fillStyle = colors.origin.color;
-        ctx.beginPath();
-        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
-        ctx.fill();
-
-
         const gradient = ctx.createLinearGradient(origin.x + radius, origin.y, target.x - radius, target.y);
 
         gradient.addColorStop(0, colors.origin.tint);
@@ -297,6 +290,15 @@
         ctx.lineTo(target.x - radius * 3, target.y);
         ctx.lineTo(target.x - radius, target.y);
         ctx.stroke();
+
+        ctx.strokeStyle = colors.origin.tint;
+        ctx.fillStyle = colors.origin.color;
+        ctx.beginPath();
+        ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fill();
+
+
+
 
         ctx.strokeStyle = colors.target.tint;
         ctx.fillStyle = colors.target.color;
