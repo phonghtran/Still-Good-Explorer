@@ -14,8 +14,8 @@
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
       <div v-for="(playlist, key, index) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
 
-        <h4 v-if="index > 4">{{key | moment("MMMM Do, YYYY")}}</h4>
-        <h4 v-if="index <= 4">{{key | moment("from")}}</h4>
+        <h4>{{key | moment("MMMM Do, YYYY")}}</h4>
+
         <ol
           class="playlistCarousel_songList"
           v-bind:style="{'background': 'linear-gradient(' + playlistStyle[key]['color'] + ', ' + playlistStyle[key]['shade'] + ')'}">
