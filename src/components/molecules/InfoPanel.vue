@@ -12,6 +12,8 @@
     <h2>{{selectedObject.artist}}</h2>
     <h4>{{selectedObject.genre}}</h4>
 
+    <div class="infoPanel_listWrapper">
+
     <h4>Playlist Appearances ({{Object.keys(selectedObject.playlists).length}})</h4>
     <ul>
       <li v-for="(position, key) in selectedObject.playlists">
@@ -21,6 +23,7 @@
         </a>
       </li>
     </ul>
+    </div>
 
 
   </div>
@@ -69,7 +72,7 @@
       background-color: $dark;
       bottom: 0;
       color: $white;
-      padding: map_get($spacers, 4);
+      padding: map_get($spacers, 4) map_get($spacers, 5);
       position: fixed;
       right: 0;
       top: 0;
@@ -78,7 +81,9 @@
     }
 
 
-
+    &_listWrapper {
+      margin-top: map_get($spacers, 4);
+    }
 
   }
   a, a:hover, a:not([href]):hover, a:not([href]):not([tabindex]):hover {

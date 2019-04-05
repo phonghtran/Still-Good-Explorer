@@ -1,10 +1,12 @@
 <template>
   <div class="playlistCarousel_wrapper">
+    <transition name="slide">
     <info-panel
       v-bind:objectID="showObjectID"
       v-on:setInfoPanelVisibility="setInfoPanelVisibility"
       v-on:jumpToPlaylist="scrollTo"
       v-if="showInfoPanel"></info-panel>
+    </transition>
     <canvas class="playlistCarousel_canvas"></canvas>
     <div class="playlistCarousel_timelineContainer d-flex justify-content-center">
       <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
@@ -448,7 +450,12 @@
 
 
 
-
+  .slide-enter-active, .slide-leave-active {
+    transition: max-width 500ms;
+  }
+  .slide-enter, .slide-leave-to  {
+    max-width: 0;
+  }
 
 
   @media (min-width: 768px) {
