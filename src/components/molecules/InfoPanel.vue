@@ -15,6 +15,7 @@
     <div class="infoPanel_listWrapper">
 
     <h4>Playlist Appearances ({{Object.keys(selectedObject.playlists).length}})</h4>
+      <p>{{durationCalculation}}</p>
     <ul>
       <li v-for="(position, key) in selectedObject.playlists">
         <a
@@ -31,7 +32,7 @@
 
 <script>
   import { mapState } from "vuex";
-
+  import moment from 'moment';
 
   export default {
     name: 'InfoPanel',
@@ -49,6 +50,16 @@
       ]),
       selectedObject: function () {
         return this.songs[this.objectID];
+      },
+      durationCalculation: function () {
+        const playlists = this.songs[this.objectID].playlists;
+        const keys = Object.keys(playlists);
+
+        const firstDate = moment(keys[0]);
+        const lastDate = moment(keys[keys.length - 1]);
+
+        return lastDate.from(firstDate, true);
+
       }
     },
     methods: {
