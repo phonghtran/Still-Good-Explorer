@@ -13,8 +13,6 @@ html {
 
 $border-radius: 0.5rem;
 
-$grid-gutter-width: 2rem;
-
 $spacer: 1rem !default;
 $spacers: () !default;
 $spacers: map-merge(
@@ -29,37 +27,4 @@ $spacers: map-merge(
   @return map-get($spacers, $key);
 }
 
-
-// for iso box effect
-
-@function boxShadowDepth($color, $n) {
-  $i: 0;
-  $j: null;
-
-  @if $n == 0 {
-    @return none;
-  }
-
-  @for $i from 1 through $n {
-    $j: $j + $i + 'px ' + $i + 'px  0 ' + $color + ', '
-  }
-
-
-
-  @return str-slice($j, 0, str_length($j) - 2);
-}
-
-
-@mixin deepShadow($depth, $color, $lighten) {
-  background-color: lighten($color, $lighten);
-  border-radius: $border-radius;
-  box-shadow: boxShadowDepth($color, $depth);
-  transition: box-shadow 100ms, transform 100ms;
-}
-
-@mixin buttonshadowActive($color, $lighten) {
-  background-color: lighten($color, $lighten) !important;
-  box-shadow: none !important;
-  transform: translate3d(0.5rem, 0.5rem, 0.5rem) !important;
-}
 

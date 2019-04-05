@@ -1,5 +1,10 @@
 <template>
   <div class="playlistCarousel_wrapper">
+    <info-panel
+      v-bind:objectID="showObjectID"
+      v-on:setInfoPanelVisibility="setInfoPanelVisibility"
+      v-on:jumpToPlaylist="scrollTo"
+      v-if="showInfoPanel"></info-panel>
     <canvas class="playlistCarousel_canvas"></canvas>
     <div class="playlistCarousel_timelineContainer d-flex justify-content-center">
       <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
@@ -7,19 +12,22 @@
 
 
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
-      <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
+      <div v-for="(playlist, key, index) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
 
-        <h4>{{key}}</h4>
+        <h4 v-if="index > 4">{{key | moment("MMMM Do, YYYY")}}</h4>
+        <h4 v-if="index <= 4">{{key | moment("from")}}</h4>
         <ol
+          class="playlistCarousel_songList"
           v-bind:style="{'background': 'linear-gradient(' + playlistStyle[key]['color'] + ', ' + playlistStyle[key]['shade'] + ')'}">
 
           <li
             v-for="(item, index) in playlist"
-            class="d-flex"
+            class="playlistCarousel_songListItem d-flex"
             v-bind:class="{'song': true, 'active': (selectedTrack===item.trackID)}"
             v-bind:style="{'border-color': playlistStyle[key]['color']}"
             v-bind:trackID="item.trackID"
             @mouseenter="selectTrack(item.trackID)"
+            @click="showInfo(item.trackID)"
           >
             <span>{{index}}</span>
             <span>
@@ -40,13 +48,17 @@
 <script>
   import { mapGetters, mapState } from "vuex";
   import moment from 'moment';
+  import InfoPanel from "./molecules/InfoPanel";
 
   export default {
     name: 'PlaylistCarousel',
+    components: {InfoPanel},
     props: {},
     data() {
       return {
-        selectedTrack: null
+        selectedTrack: null,
+        showObjectID: '',
+        showInfoPanel: false
       };
     },
     computed: {
@@ -178,6 +190,13 @@
       },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
+      },
+      showInfo(objectID){
+        this.showObjectID = objectID;
+        this.showInfoPanel = true;
+      },
+      setInfoPanelVisibility: function (state) {
+        this.showInfoPanel = state;
       },
       generateColor: function () {
         const threshold = 105; // larger = wider range of colors
@@ -343,10 +362,11 @@
 
         $font-size: 0.875rem;
 
-        li.song {
+        li {
           border: $border-style;
           border-top: 0;
           color: $white;
+          cursor: pointer;
           font-size: $font-size;
           line-height: $font-size * 1.25;
           min-width: 15rem;
@@ -422,7 +442,9 @@
 
 
     }
-  }
+
+
+  } // playlistCarousel
 
 
 
