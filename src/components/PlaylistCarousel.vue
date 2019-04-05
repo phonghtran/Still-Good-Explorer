@@ -1,13 +1,13 @@
 <template>
   <div class="playlistCarousel_wrapper">
-    <canvas class="canvas"></canvas>
-    <div class="timelineContainer d-flex justify-content-center">
+    <canvas class="playlistCarousel_canvas"></canvas>
+    <div class="playlistCarousel_timelineContainer d-flex justify-content-center">
       <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
     </div>
 
 
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
-      <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlist">
+      <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
 
         <h4>{{key}}</h4>
         <ol
@@ -59,7 +59,7 @@
         'playlistDurations'
       ]),
       playlistPositions: function () {
-        const playlists = document.querySelectorAll('.playlist');
+        const playlists = document.querySelectorAll('.playlistCarousel_playlist');
 
         let newArray = [];
         playlists.forEach(function (currentPlaylist) {
@@ -166,7 +166,7 @@
     },
     methods: {
       scrollTo(targetDate) {
-        const playlists = document.querySelectorAll('.playlist');
+        const playlists = document.querySelectorAll('.playlistCarousel_playlist');
 
         for (let index = 0; index < playlists.length; index++) {
           if (playlists[index].getAttribute('date').indexOf(targetDate) !== -1) {
@@ -175,12 +175,10 @@
             break;
           }
         }
-      }
-      ,
+      },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
-      }
-      ,
+      },
       generateColor: function () {
         const threshold = 105; // larger = wider range of colors
         const offset = 100; // higher = lighter the color
@@ -192,22 +190,6 @@
           b: Math.floor(Math.random() * threshold + offset * 0.75)
         };
       },
-      resetCanvas: function (){
-        const canvas = document.querySelector('.canvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const w = {
-          x: window.scrollX,
-          y: window.scrollY,
-          w: window.innerWidth,
-          h: window.innerHeight
-        };
-
-        ctx.clearRect(0, 0, w.w, w.h);
-      },
       handleScroll: function (){
         const w = {
           x: window.scrollX,
@@ -216,9 +198,15 @@
           h: window.innerHeight
         };
 
-        this.resetCanvas();
+        const canvas = document.querySelector('.playlistCarousel_canvas');
+        const ctx = canvas.getContext('2d');
 
-        const playlists = document.querySelectorAll('.playlist');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        ctx.clearRect(0, 0, w.w, w.h);
+
+        const playlists = document.querySelectorAll('.playlistCarousel_playlist');
 
         let currentIndex = 0;
         for (let i = 0; i < this.playlistPositions.length - 1; i++) {
@@ -273,7 +261,7 @@
         } // check each playlist offset left
       },
       renderBezier: function (trackID, origin, target, colors) {
-        const canvas = document.querySelector('.canvas');
+        const canvas = document.querySelector('.playlistCarousel_canvas');
         const ctx = canvas.getContext('2d');
 
         const radius = 8;
@@ -331,113 +319,115 @@
       margin-top: map_get($spacers, 7);
       padding-top: map_get($spacers, 3);
     }
-  }
 
-  .canvas {
-    left: 0;
-    position: fixed;
-    top: 0;
-    z-index: -1;
-  }
-
-  .playlist {
-    margin-right: map_get($spacers, 6);
-
-
-    h4 {
-      text-align: right;
+    &_canvas {
+      left: 0;
+      position: fixed;
+      top: 0;
+      z-index: -1;
     }
 
-    ol {
-      background-color: $error;
-      list-style: none;
-      padding: 0;
+    &_playlist {
+      margin-right: map_get($spacers, 6);
 
 
-      $font-size: 0.875rem;
+      h4 {
+        text-align: right;
+      }
 
-      li.song {
-        border: $border-style;
-        border-top: 0;
-        color: $white;
-        font-size: $font-size;
-        line-height: $font-size * 1.25;
-        min-width: 15rem;
-        padding: map_get($spacers, 3) map_get($spacers, 4);
+      ol {
+        background-color: $error;
+        list-style: none;
+        padding: 0;
 
 
-        &.active {
-          background-color: rgba($white, 0.85);
-          color: $black;
+        $font-size: 0.875rem;
 
+        li.song {
+          border: $border-style;
+          border-top: 0;
+          color: $white;
+          font-size: $font-size;
+          line-height: $font-size * 1.25;
+          min-width: 15rem;
+          padding: map_get($spacers, 3) map_get($spacers, 4);
+
+
+          &.active {
+            background-color: rgba($white, 0.85);
+            color: $black;
+
+          }
+
+          &:first-child {
+
+            border-top: $border-style;
+
+          }
+
+          &:last-child {
+            border-bottom: $border-style;
+          }
+
+          span {
+            display: block;
+          }
+
+
+          .artist {
+            font-size: $font-size;
+            padding-left: map_get($spacers, 3);
+          }
+
+          .name {
+            font-weight: bold;
+            padding-left: map_get($spacers, 3);
+
+          }
+        }
+      }
+
+    }
+
+    &_timelineContainer {
+      left: 0;
+      position: fixed;
+      right: 0;
+      top: 4rem;
+
+
+      button {
+        background-color: $white;
+        border-bottom: $border-style;
+        border-top: $border-style;
+        color: $error;
+        padding: map_get($spacers, 2) map_get($spacers, 3);
+
+        &:hover {
+          background-color: $error;
+          color: $white;
         }
 
+
         &:first-child {
-
-          border-top: $border-style;
-
+          border-left: $border-style;
+          border-radius: $border-radius 0 0 $border-radius;
         }
 
         &:last-child {
-          border-bottom: $border-style;
-        }
-
-        span {
-          display: block;
-        }
-
-
-        .artist {
-          font-size: $font-size;
-          padding-left: map_get($spacers, 3);
-        }
-
-        .name {
-          font-weight: bold;
-          padding-left: map_get($spacers, 3);
-
+          border-right: $border-style;
+          border-radius: 0 $border-radius $border-radius 0;
         }
       }
-    }
 
+
+    }
   }
 
 
-  .timelineContainer {
 
 
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 4rem;
 
-
-    button {
-      background-color: $white;
-      border-bottom: $border-style;
-      border-top: $border-style;
-      color: $error;
-      padding: map_get($spacers, 2) map_get($spacers, 3);
-
-      &:hover {
-        background-color: $error;
-        color: $white;
-      }
-
-
-      &:first-child {
-        border-left: $border-style;
-        border-radius: $border-radius 0 0 $border-radius;
-      }
-
-      &:last-child {
-        border-right: $border-style;
-        border-radius: 0 $border-radius $border-radius 0;
-      }
-    }
-
-
-  }
 
   @media (min-width: 768px) {
 
