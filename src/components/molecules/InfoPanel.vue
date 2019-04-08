@@ -1,5 +1,7 @@
 <template>
-  <div class="infoPanel_wrapper">
+  <div class="infoPanel_wrapper"
+       v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + darkerShade}">
+
     <p>
       <a
         class="infoPanel_closeButton"
@@ -8,22 +10,46 @@
       </a>
     </p>
 
-    <h1>{{selectedObject.name}}</h1>
-    <h2>{{selectedObject.artist}}</h2>
-    <h4>{{selectedObject.genre}}</h4>
+    <div
+      class="infoPanel_header"
+    >
+
+      <h1 v-bind:style="{'background': darkerShade}"
+          v-html="selectedObject.name"></h1>
+      <br>
+      <h2 v-bind:style="{'background':colors['shade']}"
+          v-html="selectedObject.artist"></h2>
+      <br>
+      <h4 v-bind:style="{'background':colors['shade']}"
+          v-html="selectedObject.genre"></h4>
+    </div>
 
     <div class="infoPanel_listWrapper">
 
-    <h4>Playlist Appearances ({{Object.keys(selectedObject.playlists).length}})</h4>
-      <p>{{durationCalculation}}</p>
-    <ul>
-      <li v-for="(position, key) in selectedObject.playlists">
-        <a
-          v-on:click.prevent="jumpToPlaylist(key)">
-          {{key | moment("MMMM Do, YYYY") }}
-        </a>
-      </li>
-    </ul>
+      <h4 class="infoPanel_listWrapper__header">Playlist Appearances
+        ({{Object.keys(selectedObject.playlists).length}})</h4>
+
+      <div class="infoPanel_listWrapper__item"
+           v-for="(duration) in durationCalculation">
+        <p
+          class="infoPanel_listWrapper__dates"
+          v-bind:style="{'background': darkerShade}"><a
+          class="infoPanel_listItemLink"
+          v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
+        truncateYear(duration.initialDate)}}</a>
+        <template v-if="duration.finalDate">&ndash;<a
+          class="infoPanel_listItemLink"
+          v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
+          truncateMonth(duration.finalDate)}}</a>
+        </template>
+          </p>
+        <br>
+        <p v-bind:style="{'background': colors['shade']}">About {{duration.duration}}</p>
+
+
+      </div>
+
+
     </div>
 
 
@@ -37,7 +63,8 @@
   export default {
     name: 'InfoPanel',
     props: {
-      objectID: String
+      objectID: String,
+      colors: Object
     },
     data() {
       return {};
@@ -48,17 +75,75 @@
         'playlists',
         'songByAppearances'
       ]),
+      darkerShade: function () {
+        const nudge = 50;
+
+        const shade = {
+          r: Math.max(this.colors.original.color.r - nudge, 0),
+          g: Math.max(this.colors.original.color.g - nudge, 0),
+          b: Math.max(this.colors.original.color.b - nudge, 0)
+        };
+
+        return '#' + shade.r.toString(16) + shade.g.toString(16) + shade.b.toString(16);
+      },
       selectedObject: function () {
         return this.songs[this.objectID];
       },
       durationCalculation: function () {
+
         const playlists = this.songs[this.objectID].playlists;
         const keys = Object.keys(playlists);
 
-        const firstDate = moment(keys[0]);
-        const lastDate = moment(keys[keys.length - 1]);
+        const masterPlaylistsKeys = Object.keys(this.playlists);
 
-        return lastDate.from(firstDate, true);
+        if (keys.length > 1) {
+          let anchorDate = 0;
+          let prevIndex = masterPlaylistsKeys.indexOf(keys[0]);
+          let durationCurrentIndex = 0;
+          let durations = [];
+          const defaultMessage = '<1 week';
+
+          for (let keyIndex = 1; keyIndex < keys.length; keyIndex++) {
+            const thisCurrentIndex = masterPlaylistsKeys.indexOf(keys[keyIndex]);
+
+
+            if (typeof durations[durationCurrentIndex] === 'undefined') {
+              durations[durationCurrentIndex] = {
+                duration: defaultMessage,
+                playlists: [],
+                initialDate: keys[anchorDate]
+              };
+            }
+
+            if (thisCurrentIndex - prevIndex === 1) {
+              const thisDate = moment(keys[keyIndex]);
+
+              durations[durationCurrentIndex].duration = thisDate.from(moment(keys[anchorDate]), true);
+              durations[durationCurrentIndex].finalDate = keys[keyIndex];
+
+
+            } else {
+
+
+              durationCurrentIndex++;
+              anchorDate = keyIndex;
+
+              durations[durationCurrentIndex] = {
+                duration: '<1 week',
+                playlists: [],
+                initialDate: keys[keyIndex]
+              };
+            }
+
+            durations[durationCurrentIndex].playlists.push(keys[keyIndex]);
+
+            prevIndex = thisCurrentIndex;
+          }
+
+          return durations;
+        }
+
+        return defaultMessage;
 
       }
     },
@@ -70,7 +155,25 @@
         this.$emit('jumpToPlaylist', key);
       }
     },
-    filters: {}
+    filters: {
+      truncateYear: function (iniitialDate, compareDate) {
+        if (moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY')) {
+          return moment(iniitialDate).format("MMM D");
+        }
+
+        return moment(iniitialDate).format("MMM Do, YYYY");
+
+      },
+      truncateMonth: function (iniitialDate, compareDate) {
+        if (moment(iniitialDate).format('MMM') === moment(compareDate).format('MMM') &&
+          moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY')) {
+          return moment(iniitialDate).format("Do, YYYY");
+        }
+
+        return moment(iniitialDate).format("MMM Do, YYYY");
+
+      }
+    }
   };
 </script>
 
@@ -91,14 +194,70 @@
       z-index: $zindex-popover;
     }
 
+    &_header {
+      margin-top: map_get($spacers, 5);
 
-    &_listWrapper {
-      margin-top: map_get($spacers, 4);
+      h1 {
+        font-size: 2rem;
+        line-height: 3rem;
+      }
+      * {
+        display: inline-block;
+        padding: 0 map_get($spacers, 2);
+        margin-bottom: 0;
+      }
     }
 
+
+    &_listWrapper {
+
+      padding: map_get($spacers, 5) 0 map_get($spacers, 4);
+
+      &__header {
+        display: inline-block;
+        margin-bottom: map_get($spacers, 3);
+      }
+
+      &__dates {
+        padding: 0 map_get($spacers, 2);
+      }
+
+      &__item {
+        margin-bottom: map_get($spacers, 2);
+        p {
+          display: inline-block;
+          font-size: 1rem;
+          line-height: 1.25rem;
+          margin-bottom: 0;
+          padding: map_get($spacers, 1) map_get($spacers, 2);
+        }
+      }
+    }
+
+    &_list {
+      padding: 0;
+    }
+
+    &_listItemLink {
+      font-weight: bold;
+    }
+
+
+
   }
-  a, a:hover, a:not([href]):hover, a:not([href]):not([tabindex]):hover {
-    color: $white !important;
+
+  a, a:not([href]), a:not([href]):not([tabindex]) {
+
+    color: $white;
+    cursor: pointer;
+    display: inline;
+    padding: 0;
+    text-decoration: underline;
+
+    &:hover {
+      color: $white;
+      text-decoration: none;
+    }
   }
 
 </style>

@@ -3,6 +3,7 @@
     <transition name="slide">
     <info-panel
       v-bind:objectID="showObjectID"
+      v-bind:colors="infoPanelColor"
       v-on:setInfoPanelVisibility="setInfoPanelVisibility"
       v-on:jumpToPlaylist="scrollTo"
       v-if="showInfoPanel"></info-panel>
@@ -29,7 +30,7 @@
             v-bind:style="{'border-color': playlistStyle[key]['color']}"
             v-bind:trackID="item.trackID"
             @mouseenter="selectTrack(item.trackID)"
-            @click="showInfo(item.trackID)"
+            @click="showInfo(item.trackID, key)"
           >
             <span>{{index}}</span>
             <span>
@@ -60,7 +61,8 @@
       return {
         selectedTrack: null,
         showObjectID: '',
-        showInfoPanel: false
+        showInfoPanel: false,
+        infoPanelColor: {}
       };
     },
     computed: {
@@ -193,9 +195,10 @@
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;
       },
-      showInfo(objectID){
+      showInfo(objectID, keyColor){
         this.showObjectID = objectID;
         this.showInfoPanel = true;
+        this.infoPanelColor = this.playlistStyle[keyColor];
       },
       setInfoPanelVisibility: function (state) {
         this.showInfoPanel = state;
