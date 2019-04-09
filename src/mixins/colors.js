@@ -73,6 +73,9 @@ export const colorMixin = {
 
       return '#' + r + g + b;
     },
+    objectToRGBA: function (obj, alpha) {
+      return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + alpha + ')';
+    },
     getTintShade: function (originalRGB, percentage, mode = 'l') {
       const originalHSL = this.getHSL(originalRGB);
 
@@ -84,7 +87,7 @@ export const colorMixin = {
       let tempHSL = originalHSL;
       let delta;
 
-      if (mode === 's'){
+      if (mode === 's') {
         const s = originalHSL.s;
 
         delta = s + percentage;
@@ -93,14 +96,14 @@ export const colorMixin = {
         shadeTint.tint.hsl = tempHSL;
 
 
-        delta = s - percentage ;
+        delta = s - percentage;
         tempHSL.s = Math.max(0, delta);
         shadeTint.shade = this.HSLtoRGB(tempHSL);
         shadeTint.shade.hsl = tempHSL;
-      } else if (mode === 'h'){
+      } else if (mode === 'h') {
         const h = originalHSL.h;
-        delta =h + percentage * 360;
-        if (delta > 360){
+        delta = h + percentage * 360;
+        if (delta > 360) {
           delta -= 360;
         }
         tempHSL.h = delta;
@@ -108,8 +111,8 @@ export const colorMixin = {
         shadeTint.tint.hsl = tempHSL;
 
 
-        delta = h - percentage * 360 ;
-        if (delta < 360){
+        delta = h - percentage * 360;
+        if (delta < 360) {
           delta += 360;
         }
         tempHSL.h = delta;
@@ -123,7 +126,7 @@ export const colorMixin = {
         shadeTint.shade = this.HSLtoRGB(tempHSL);
         shadeTint.shade.hsl = tempHSL;
 
-        delta = l + percentage ;
+        delta = l + percentage;
         tempHSL.l = Math.min(1, delta);
         shadeTint.tint = this.HSLtoRGB(tempHSL);
         shadeTint.tint.hsl = tempHSL;
@@ -196,6 +199,37 @@ export const colorMixin = {
       } // if
 
       return newRGB;
+    },
+    generateLinearGradient: function (colorSet) {
+      return 'linear-gradient(' + colorSet.hex.color + ', ' + colorSet.hex.shade + ')'
+    },
+    generateRadialGradient: function (colorSet) {
+      return 'radial-gradient( ' +
+        this.objectToRGBA(colorSet.original.color, 0.5) + ' 20%, ' +
+        this.objectToRGBA(colorSet.original.color, 0.25) + ' 35%,' +
+        'transparent ),' +
+        'radial-gradient( farthest-side at bottom left, ' +
+        this.objectToRGBA(colorSet.original.shade, 1) + ' 20%, ' +
+        this.objectToRGBA(colorSet.original.shade, 0.5) + ' 50%,' +
+        this.objectToRGBA(colorSet.original.shade, 0.25) + ' 70%, ' +
+        'transparent ),' +
+        'radial-gradient( farthest-side at top right, ' +
+        this.objectToRGBA(colorSet.original.tint, 1) + ' 0, ' +
+        this.objectToRGBA(colorSet.original.tint, 0.8) + ' 33%, ' +
+        this.objectToRGBA(colorSet.original.color, 0.5) + ' 50%,' +
+        this.objectToRGBA(colorSet.original.tint, 0.58) + ' 68%, ' +
+        this.objectToRGBA(colorSet.original.color, 0.25) + ' 80%,' +
+        'transparent ),' +
+        'radial-gradient( farthest-side at top left, ' +
+        this.objectToRGBA(colorSet.original.tint, 1) + ' 50%,' +
+        this.objectToRGBA(colorSet.original.shade, 0.8) + ' 80%,' +
+        ' transparent ),'+
+        'radial-gradient( farthest-side at bottom right, ' +
+        this.objectToRGBA(colorSet.original.shade, 1) + ' 20%,' +
+        this.objectToRGBA(colorSet.original.color, 1) + ' 66%,' +
+        ' transparent )';
+
+
     }
   }
 };

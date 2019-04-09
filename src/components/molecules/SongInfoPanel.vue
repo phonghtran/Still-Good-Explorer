@@ -1,8 +1,6 @@
 <template>
-  <div class="scrollWrapper" v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + colors['shade']}">
-    <div class="infoPanel_wrapper"
-         >
-
+  <div class="scrollWrapper" v-bind:style="{'background': generateRadialGradient(colors), 'border-left': '1px solid ' + colors['shade']}">
+    <div class="infoPanel_wrapper">
       <p>
         <a
           class="infoPanel_closeButton"
@@ -14,14 +12,14 @@
       <div
         class="infoPanel_header"
       >
-        <h1 v-bind:style="{'background': colors['shade']}"
+        <h1 v-bind:style="{'background': colors['hex']['shade']}"
             v-html="selectedObject.name"></h1>
         <br>
-        <h2 v-bind:style="{'background':colors['color']}"
+        <h2 v-bind:style="{'background':colors['hex']['color']}"
             v-html="selectedObject.artist"></h2>
         <br>
         <h4 v-if="selectedObject.genre.length > 0"
-            v-bind:style="{'background':colors['color']}"
+            v-bind:style="{'background':colors['hex']['color']}"
             v-html="selectedObject.genre"></h4>
       </div>
 
@@ -34,21 +32,23 @@
              class="infoPanel_listWrapper__item">
           <p
             class="infoPanel_listWrapper__dates"
-            v-bind:style="{'background': colors['shade']}">
-            <a
-              class="infoPanel_listItemLink"
-              v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
-              truncateYear(duration.initialDate)}}</a>
+            v-bind:style="{'background': colors['hex']['shade']}">
             <template v-if="duration.finalDate">
-              &ndash;
               <a
                 class="infoPanel_listItemLink"
-                v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
-                truncateMonth(duration.finalDate)}}</a>
+                v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
+                  truncateYear(duration.initialDate)}}</a>
+
+              &ndash;
             </template>
+            <a
+              class="infoPanel_listItemLink"
+              v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
+                truncateMonth(duration.finalDate)}}</a>
+
           </p>
           <br>
-          <p v-bind:style="{'background': colors['color']}">About {{duration.duration}}</p>
+          <p v-bind:style="{'background': colors['hex']['color']}">About {{duration.duration}}</p>
 
 
         </div>
@@ -67,7 +67,7 @@
   import { colorMixin } from "../../mixins/colors";
 
   export default {
-    name: 'InfoPanel',
+    name: 'SongInfoPanel',
     props: {
       objectID: String,
       colors: Object
@@ -87,18 +87,19 @@
         return this.songs[this.objectID];
       },
       durationCalculation: function () {
-
         const playlists = this.songs[this.objectID].playlists;
         const keys = Object.keys(playlists);
 
         const masterPlaylistsKeys = Object.keys(this.playlists);
+        const defaultMessage = '<1 week';
+
 
         if (keys.length > 1) {
           let anchorDate = 0;
           let prevIndex = masterPlaylistsKeys.indexOf(keys[0]);
           let durationCurrentIndex = 0;
           let durations = [];
-          const defaultMessage = '<1 week';
+
 
           for (let keyIndex = 1; keyIndex < keys.length; keyIndex++) {
             const thisCurrentIndex = masterPlaylistsKeys.indexOf(keys[keyIndex]);
@@ -117,11 +118,7 @@
 
               durations[durationCurrentIndex].duration = thisDate.from(moment(keys[anchorDate]), true);
               durations[durationCurrentIndex].finalDate = keys[keyIndex];
-
-
             } else {
-
-
               durationCurrentIndex++;
               anchorDate = keyIndex;
 
@@ -140,7 +137,15 @@
           return durations;
         }
 
-        return defaultMessage;
+
+
+        return [{
+          duration: defaultMessage,
+          playlists: [
+            keys[0]
+          ],
+          initialDate: keys[0]
+        }];
 
       }
     },
@@ -162,8 +167,10 @@
 
       },
       truncateMonth: function (iniitialDate, compareDate) {
+
         if (moment(iniitialDate).format('MMM') === moment(compareDate).format('MMM') &&
-          moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY')) {
+          moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY') &&
+          typeof compareDate !== 'undefined') {
           return moment(iniitialDate).format("Do, YYYY");
         }
 
@@ -191,11 +198,8 @@
 
   .infoPanel {
     &_wrapper {
-
       color: $white;
       padding: map_get($spacers, 4);
-
-
     }
 
     &_header {
@@ -266,18 +270,24 @@
   }
 
   @media (min-width: 768px) {
+    .scrollWrapper {
+      width: 50vw;
+    }
     .infoPanel {
       &_wrapper {
         padding: map_get($spacers, 4) map_get($spacers, 5);
-        width: 50vw;
+
       }
     }
   }
 
   @media (min-width: 1024px) {
+    .scrollWrapper {
+      width: 33vw;
+    }
     .infoPanel {
       &_wrapper {
-        width: 33vw;
+
       }
     }
   }

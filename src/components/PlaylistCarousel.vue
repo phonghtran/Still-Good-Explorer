@@ -1,12 +1,12 @@
 <template>
   <div class="playlistCarousel_wrapper">
     <transition name="slide">
-      <info-panel
+      <song-info-panel
         v-if="showInfoPanel"
         v-bind:objectID="showObjectID"
         v-bind:colors="infoPanelColor"
         v-on:setInfoPanelVisibility="setInfoPanelVisibility"
-        v-on:jumpToPlaylist="scrollTo"></info-panel>
+        v-on:jumpToPlaylist="scrollTo"></song-info-panel>
     </transition>
     <canvas class="playlistCarousel_canvas"></canvas>
 
@@ -21,13 +21,13 @@
 
         <ol
           class="playlistCarousel_songList"
-          v-bind:style="{'background': 'linear-gradient(' + playlistStyle[key]['color'] + ', ' + playlistStyle[key]['shade'] + ')'}">
+          v-bind:style="{'background': generateLinearGradient(playlistStyle[key]) }">
 
           <li
             v-for="(item, index) in playlist"
             class="playlistCarousel_songListItem d-flex"
             v-bind:class="{'song': true, 'active': (selectedTrack===item.trackID)}"
-            v-bind:style="{'border-color': playlistStyle[key]['color']}"
+            v-bind:style="{'border-color': playlistStyle[key]['hex']['color']}"
             v-bind:trackID="item.trackID"
             @mouseenter="selectTrack(item.trackID)"
             @click="showInfo(item.trackID, key)"
@@ -51,13 +51,13 @@
 <script>
   import { mapGetters, mapState } from "vuex";
   import moment from 'moment';
-  import InfoPanel from "./molecules/InfoPanel";
+  import SongInfoPanel from "./molecules/SongInfoPanel";
   import { colorMixin } from "../mixins/colors";
   import PlaylistTimeline from "./molecules/PlaylistTimeline";
 
   export default {
     name: 'PlaylistCarousel',
-    components: {PlaylistTimeline, InfoPanel},
+    components: {PlaylistTimeline, SongInfoPanel},
     props: {},
     data() {
       return {
@@ -148,9 +148,11 @@
           const shadeTint = this.getTintShade(colors,percentage,'l');
 
           newArray[playlist] = {
-            color: this.objectToHex(colors),
-            shade: this.objectToHex(shadeTint.shade),
-            tint: this.objectToHex(shadeTint.tint),
+            hex: {
+              color: this.objectToHex(colors),
+              shade: this.objectToHex(shadeTint.shade),
+              tint: this.objectToHex(shadeTint.tint),
+            },
             original: {
               color: colors,
               shade: shadeTint.shade,

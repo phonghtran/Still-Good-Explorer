@@ -118,7 +118,7 @@
             border: 0;
             border-radius: 0;
             margin-bottom: map_get($spacers, 3);
-            text-align: right;
+            text-align: left;
 
             &:hover {
               background-color: transparent;
