@@ -199,11 +199,11 @@
 
       h1 {
         font-size: 2rem;
-        line-height: 3rem;
+        line-height: 2rem;
       }
       * {
         display: inline-block;
-        padding: 0 map_get($spacers, 2);
+        padding: 0 map_get($spacers, 2) map_get($spacers, 2);
         margin-bottom: 0;
       }
     }
