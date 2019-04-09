@@ -59,63 +59,83 @@ export const colorMixin = {
       let g = obj.g.toString(16);
       let b = obj.b.toString(16);
 
-      if (obj.r < 17) {
+      if (obj.r < 16) {
         r = '0' + r;
       }
 
-      if (obj.g < 17) {
+      if (obj.g < 16) {
         g = '0' + g;
       }
 
-      if (obj.b < 17) {
+      if (obj.b < 16) {
         b = '0' + b;
       }
 
       return '#' + r + g + b;
     },
     getTintShade: function (originalRGB, percentage, mode = 'l') {
-      const convertedHSL = this.getHSL(originalRGB);
-
+      const originalHSL = this.getHSL(originalRGB);
 
       let shadeTint = {
         shade: {},
         tint: {}
       };
 
-      let tempHSL = convertedHSL;
+      let tempHSL = originalHSL;
+      let delta;
 
       switch (mode) {
         case 's':
-          tempHSL.s = Math.min(1, convertedHSL.s + percentage);
+          const s = originalHSL.s;
+
+          delta = s + percentage;
+          tempHSL.s = Math.min(1, delta);
           shadeTint.tint = this.HSLtoRGB(tempHSL);
           shadeTint.tint.hsl = tempHSL;
 
-          tempHSL.s = Math.max(0, convertedHSL.s - percentage);
+
+          delta = s - percentage ;
+          tempHSL.s = Math.max(0, delta);
           shadeTint.shade = this.HSLtoRGB(tempHSL);
           shadeTint.shade.hsl = tempHSL;
+
           break;
 
         case 'h':
-          const delta = percentage * 360;
-          tempHSL.h = Math.min(360, convertedHSL.h + delta);
+          const h = originalHSL.h;
+          delta =h + percentage * 360;
+          if (delta > 360){
+            delta -= 360;
+          }
+          tempHSL.h = delta;
           shadeTint.tint = this.HSLtoRGB(tempHSL);
           shadeTint.tint.hsl = tempHSL;
 
-          tempHSL.h = Math.max(0, convertedHSL.h - delta);
+
+          delta = h - percentage * 360 ;
+          if (delta < 360){
+            delta += 360;
+          }
+          tempHSL.h = delta;
           shadeTint.shade = this.HSLtoRGB(tempHSL);
           shadeTint.shade.hsl = tempHSL;
+
           break;
         default:
-          tempHSL.l = Math.min(1, convertedHSL.l + percentage);
+          const l = originalHSL.l;
+          delta = l - percentage;
+          tempHSL.l = Math.max(0, delta);
+          shadeTint.shade = this.HSLtoRGB(tempHSL);
+          shadeTint.shade.hsl = tempHSL;
+
+          delta = l + percentage ;
+          tempHSL.l = Math.min(1, delta);
           shadeTint.tint = this.HSLtoRGB(tempHSL);
           shadeTint.tint.hsl = tempHSL;
 
-          tempHSL.l = Math.max(0, convertedHSL.l - percentage);
-          shadeTint.shade = this.HSLtoRGB(tempHSL);
-          shadeTint.shade.hsl = tempHSL;
+
           break;
       }
-
 
       return shadeTint;
     },
@@ -123,7 +143,7 @@ export const colorMixin = {
       let newRGB;
 
       if (targetHSL.s === 0) {
-        const gray = targetHSL.l * 255;
+        const gray = Math.ceil(targetHSL.l * 255);
         newRGB = {
           r: gray,
           g: gray,
@@ -138,7 +158,6 @@ export const colorMixin = {
         const z = Math.ceil(Math.abs(m * 255));
         c = Math.ceil(Math.abs((c + m) * 255));
         x = Math.ceil(Math.abs((x + m) * 255));
-
 
         const h = targetHSL.h;
 

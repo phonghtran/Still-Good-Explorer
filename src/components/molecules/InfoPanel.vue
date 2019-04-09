@@ -1,6 +1,6 @@
 <template>
   <div class="infoPanel_wrapper"
-       v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + darkerShade}">
+       v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + colors['shade']}">
 
     <p>
       <a
@@ -13,7 +13,7 @@
     <div
       class="infoPanel_header"
     >
-      <h1 v-bind:style="{'background': darkerShade}"
+      <h1 v-bind:style="{'background': colors['shade']}"
           v-html="selectedObject.name"></h1>
       <br>
       <h2 v-bind:style="{'background':colors['color']}"
@@ -33,7 +33,7 @@
            class="infoPanel_listWrapper__item">
         <p
           class="infoPanel_listWrapper__dates"
-          v-bind:style="{'background': darkerShade}">
+          v-bind:style="{'background': colors['shade']}">
           <a
             class="infoPanel_listItemLink"
             v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
@@ -80,12 +80,7 @@
         'playlists',
         'songByAppearances'
       ]),
-      darkerShade: function () {
-        const shadeTint = this.getTintShade(this.colors.original.color, 0.6, 'l');
-
-
-        return this.objectToHex(shadeTint.shade);
-      },
+     
       selectedObject: function () {
         return this.songs[this.objectID];
       },
