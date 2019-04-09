@@ -1,61 +1,63 @@
 <template>
-  <div class="infoPanel_wrapper"
-       v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + colors['shade']}">
+  <div class="scrollWrapper" v-bind:style="{'background': 'linear-gradient(' + colors['tint'] + ', ' + colors['shade'] + ')', 'border-left': '1px solid ' + colors['shade']}">
+    <div class="infoPanel_wrapper"
+         >
 
-    <p>
-      <a
-        class="infoPanel_closeButton"
-        v-on:click.prevent="closePanel">
-        Close Panel
-      </a>
-    </p>
+      <p>
+        <a
+          class="infoPanel_closeButton"
+          v-on:click.prevent="closePanel">
+          Close Panel
+        </a>
+      </p>
 
-    <div
-      class="infoPanel_header"
-    >
-      <h1 v-bind:style="{'background': colors['shade']}"
-          v-html="selectedObject.name"></h1>
-      <br>
-      <h2 v-bind:style="{'background':colors['color']}"
-          v-html="selectedObject.artist"></h2>
-      <br>
-      <h4 v-if="selectedObject.genre.length > 0"
-          v-bind:style="{'background':colors['color']}"
-          v-html="selectedObject.genre"></h4>
-    </div>
+      <div
+        class="infoPanel_header"
+      >
+        <h1 v-bind:style="{'background': colors['shade']}"
+            v-html="selectedObject.name"></h1>
+        <br>
+        <h2 v-bind:style="{'background':colors['color']}"
+            v-html="selectedObject.artist"></h2>
+        <br>
+        <h4 v-if="selectedObject.genre.length > 0"
+            v-bind:style="{'background':colors['color']}"
+            v-html="selectedObject.genre"></h4>
+      </div>
 
-    <div class="infoPanel_listWrapper">
+      <div class="infoPanel_listWrapper">
 
-      <h4 class="infoPanel_listWrapper__header">Playlist Appearances
-        ({{Object.keys(selectedObject.playlists).length}})</h4>
+        <h4 class="infoPanel_listWrapper__header">Playlist Appearances
+          ({{Object.keys(selectedObject.playlists).length}})</h4>
 
-      <div v-for="(duration) in durationCalculation"
-           class="infoPanel_listWrapper__item">
-        <p
-          class="infoPanel_listWrapper__dates"
-          v-bind:style="{'background': colors['shade']}">
-          <a
-            class="infoPanel_listItemLink"
-            v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
-            truncateYear(duration.initialDate)}}</a>
-          <template v-if="duration.finalDate">
-            &ndash;
+        <div v-for="(duration) in durationCalculation"
+             class="infoPanel_listWrapper__item">
+          <p
+            class="infoPanel_listWrapper__dates"
+            v-bind:style="{'background': colors['shade']}">
             <a
               class="infoPanel_listItemLink"
-              v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
-              truncateMonth(duration.finalDate)}}</a>
-          </template>
-        </p>
-        <br>
-        <p v-bind:style="{'background': colors['color']}">About {{duration.duration}}</p>
+              v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
+              truncateYear(duration.initialDate)}}</a>
+            <template v-if="duration.finalDate">
+              &ndash;
+              <a
+                class="infoPanel_listItemLink"
+                v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
+                truncateMonth(duration.finalDate)}}</a>
+            </template>
+          </p>
+          <br>
+          <p v-bind:style="{'background': colors['color']}">About {{duration.duration}}</p>
+
+
+        </div>
 
 
       </div>
 
 
     </div>
-
-
   </div>
 </template>
 
@@ -80,7 +82,7 @@
         'playlists',
         'songByAppearances'
       ]),
-     
+
       selectedObject: function () {
         return this.songs[this.objectID];
       },
@@ -176,17 +178,24 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
+  .scrollWrapper {
+    background-color: $dark;
+    bottom: 0;
+    overflow: scroll;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100vw;
+    z-index: $zindex-popover;
+  }
+
   .infoPanel {
     &_wrapper {
-      background-color: $dark;
-      bottom: 0;
+
       color: $white;
-      padding: map_get($spacers, 4) map_get($spacers, 5);
-      position: fixed;
-      right: 0;
-      top: 0;
-      width: 33vw;
-      z-index: $zindex-popover;
+      padding: map_get($spacers, 4);
+
+
     }
 
     &_header {
@@ -253,6 +262,23 @@
     &:hover {
       color: $white;
       text-decoration: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .infoPanel {
+      &_wrapper {
+        padding: map_get($spacers, 4) map_get($spacers, 5);
+        width: 50vw;
+      }
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .infoPanel {
+      &_wrapper {
+        width: 33vw;
+      }
     }
   }
 

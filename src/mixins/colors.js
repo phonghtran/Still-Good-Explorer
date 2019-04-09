@@ -84,58 +84,52 @@ export const colorMixin = {
       let tempHSL = originalHSL;
       let delta;
 
-      switch (mode) {
-        case 's':
-          const s = originalHSL.s;
+      if (mode === 's'){
+        const s = originalHSL.s;
 
-          delta = s + percentage;
-          tempHSL.s = Math.min(1, delta);
-          shadeTint.tint = this.HSLtoRGB(tempHSL);
-          shadeTint.tint.hsl = tempHSL;
-
-
-          delta = s - percentage ;
-          tempHSL.s = Math.max(0, delta);
-          shadeTint.shade = this.HSLtoRGB(tempHSL);
-          shadeTint.shade.hsl = tempHSL;
-
-          break;
-
-        case 'h':
-          const h = originalHSL.h;
-          delta =h + percentage * 360;
-          if (delta > 360){
-            delta -= 360;
-          }
-          tempHSL.h = delta;
-          shadeTint.tint = this.HSLtoRGB(tempHSL);
-          shadeTint.tint.hsl = tempHSL;
+        delta = s + percentage;
+        tempHSL.s = Math.min(1, delta);
+        shadeTint.tint = this.HSLtoRGB(tempHSL);
+        shadeTint.tint.hsl = tempHSL;
 
 
-          delta = h - percentage * 360 ;
-          if (delta < 360){
-            delta += 360;
-          }
-          tempHSL.h = delta;
-          shadeTint.shade = this.HSLtoRGB(tempHSL);
-          shadeTint.shade.hsl = tempHSL;
-
-          break;
-        default:
-          const l = originalHSL.l;
-          delta = l - percentage;
-          tempHSL.l = Math.max(0, delta);
-          shadeTint.shade = this.HSLtoRGB(tempHSL);
-          shadeTint.shade.hsl = tempHSL;
-
-          delta = l + percentage ;
-          tempHSL.l = Math.min(1, delta);
-          shadeTint.tint = this.HSLtoRGB(tempHSL);
-          shadeTint.tint.hsl = tempHSL;
+        delta = s - percentage ;
+        tempHSL.s = Math.max(0, delta);
+        shadeTint.shade = this.HSLtoRGB(tempHSL);
+        shadeTint.shade.hsl = tempHSL;
+      } else if (mode === 'h'){
+        const h = originalHSL.h;
+        delta =h + percentage * 360;
+        if (delta > 360){
+          delta -= 360;
+        }
+        tempHSL.h = delta;
+        shadeTint.tint = this.HSLtoRGB(tempHSL);
+        shadeTint.tint.hsl = tempHSL;
 
 
-          break;
+        delta = h - percentage * 360 ;
+        if (delta < 360){
+          delta += 360;
+        }
+        tempHSL.h = delta;
+        shadeTint.shade = this.HSLtoRGB(tempHSL);
+        shadeTint.shade.hsl = tempHSL;
+
+      } else {
+        const l = originalHSL.l;
+        delta = l - percentage;
+        tempHSL.l = Math.max(0, delta);
+        shadeTint.shade = this.HSLtoRGB(tempHSL);
+        shadeTint.shade.hsl = tempHSL;
+
+        delta = l + percentage ;
+        tempHSL.l = Math.min(1, delta);
+        shadeTint.tint = this.HSLtoRGB(tempHSL);
+        shadeTint.tint.hsl = tempHSL;
+
       }
+
 
       return shadeTint;
     },

@@ -9,9 +9,8 @@
         v-on:jumpToPlaylist="scrollTo"></info-panel>
     </transition>
     <canvas class="playlistCarousel_canvas"></canvas>
-    <div class="playlistCarousel_timelineContainer d-flex justify-content-center">
-      <button v-for="button in buttonDates" @click="scrollTo(button)">{{button}}</button>
-    </div>
+
+    <playlist-timeline v-bind:buttonDates="buttonDates" v-on:scrollTo="scrollTo"></playlist-timeline>
 
 
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
@@ -54,10 +53,11 @@
   import moment from 'moment';
   import InfoPanel from "./molecules/InfoPanel";
   import { colorMixin } from "../mixins/colors";
+  import PlaylistTimeline from "./molecules/PlaylistTimeline";
 
   export default {
     name: 'PlaylistCarousel',
-    components: {InfoPanel},
+    components: {PlaylistTimeline, InfoPanel},
     props: {},
     data() {
       return {
@@ -178,10 +178,16 @@
       scrollTo(targetDate) {
         const playlists = document.querySelectorAll('.playlistCarousel_playlist');
 
+        let offsetNudge = 100;
+
+        if (window.innerWidth < window.innerHeight){
+          offsetNudge = 16;
+        }
+
         for (let index = 0; index < playlists.length; index++) {
           if (playlists[index].getAttribute('date').indexOf(targetDate) !== -1) {
 
-            window.scrollTo(playlists[index].offsetLeft - 100, 0);
+            window.scrollTo(playlists[index].offsetLeft - offsetNudge, 0);
             break;
           }
         }
@@ -315,7 +321,7 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
-  $border-style: 2px solid rgba($error, 1);
+
 
 
   .playlistCarousel {
@@ -398,39 +404,7 @@
 
     }
 
-    &_timelineContainer {
-      left: 0;
-      position: fixed;
-      right: 0;
-      top: 4rem;
 
-
-      button {
-        background-color: $white;
-        border-bottom: $border-style;
-        border-top: $border-style;
-        color: $error;
-        padding: map_get($spacers, 2) map_get($spacers, 3);
-
-        &:hover {
-          background-color: $error;
-          color: $white;
-        }
-
-
-        &:first-child {
-          border-left: $border-style;
-          border-radius: $border-radius 0 0 $border-radius;
-        }
-
-        &:last-child {
-          border-right: $border-style;
-          border-radius: 0 $border-radius $border-radius 0;
-        }
-      }
-
-
-    }
 
 
   } // playlistCarousel
