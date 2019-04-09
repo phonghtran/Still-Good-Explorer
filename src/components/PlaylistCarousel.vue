@@ -1,12 +1,12 @@
 <template>
   <div class="playlistCarousel_wrapper">
     <transition name="slide">
-    <info-panel
-      v-bind:objectID="showObjectID"
-      v-bind:colors="infoPanelColor"
-      v-on:setInfoPanelVisibility="setInfoPanelVisibility"
-      v-on:jumpToPlaylist="scrollTo"
-      v-if="showInfoPanel"></info-panel>
+      <info-panel
+        v-if="showInfoPanel"
+        v-bind:objectID="showObjectID"
+        v-bind:colors="infoPanelColor"
+        v-on:setInfoPanelVisibility="setInfoPanelVisibility"
+        v-on:jumpToPlaylist="scrollTo"></info-panel>
     </transition>
     <canvas class="playlistCarousel_canvas"></canvas>
     <div class="playlistCarousel_timelineContainer d-flex justify-content-center">
@@ -15,9 +15,10 @@
 
 
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
-      <div v-for="(playlist, key, index) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
+      <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
 
         <h4>{{key | moment("MMMM Do, YYYY")}}</h4>
+
 
         <ol
           class="playlistCarousel_songList"
@@ -52,6 +53,7 @@
   import { mapGetters, mapState } from "vuex";
   import moment from 'moment';
   import InfoPanel from "./molecules/InfoPanel";
+  import { colorMixin } from "../mixins/colors";
 
   export default {
     name: 'PlaylistCarousel',
@@ -138,30 +140,21 @@
       },
       playlistStyle: function () {
         let newArray = {};
+        const percentage = 0.2;
 
         for (let playlist in this.playlists) {
-          const colors = this.generateColor();
+          const colors =  this.generateColor();
 
-          const nudge = 25;
-          const shade = {
-            r: Math.max(colors.r - nudge, 0),
-            g: Math.max(colors.g - nudge, 0),
-            b: Math.max(colors.b - nudge, 0)
-          };
-          const tint = {
-            r: Math.min(colors.r + nudge, 255),
-            g: Math.min(colors.g + nudge, 255),
-            b: Math.min(colors.b + nudge, 255)
-          };
+          const shadeTint = this.getTintShade(colors,percentage,'l');
 
           newArray[playlist] = {
-            color: '#' + colors.r.toString(16) + colors.g.toString(16) + colors.b.toString(16),
-            shade: '#' + shade.r.toString(16) + shade.g.toString(16) + shade.b.toString(16),
-            tint: '#' + tint.r.toString(16) + tint.g.toString(16) + tint.b.toString(16),
+            color: this.objectToHex(colors),
+            shade: this.objectToHex(shadeTint.shade),
+            tint: this.objectToHex(shadeTint.tint),
             original: {
               color: colors,
-              shade: shade,
-              tint: tint
+              shade: shadeTint.shade,
+              tint: shadeTint.tint
             }
           };
         }
@@ -180,6 +173,7 @@
     destroyed: function () {
       window.removeEventListener('scroll', this.handleScroll);
     },
+    mixins: [colorMixin],
     methods: {
       scrollTo(targetDate) {
         const playlists = document.querySelectorAll('.playlistCarousel_playlist');
@@ -203,17 +197,7 @@
       setInfoPanelVisibility: function (state) {
         this.showInfoPanel = state;
       },
-      generateColor: function () {
-        const threshold = 105; // larger = wider range of colors
-        const offset = 100; // higher = lighter the color
 
-        // skewing purples with 0.25 green and 0.75 blue
-        return {
-          r: Math.floor(Math.random() * threshold + offset),
-          g: Math.floor(Math.random() * threshold + offset * 0.25),
-          b: Math.floor(Math.random() * threshold + offset * 0.75)
-        };
-      },
       handleScroll: function (){
         const w = {
           x: window.scrollX,

@@ -13,14 +13,14 @@
     <div
       class="infoPanel_header"
     >
-
       <h1 v-bind:style="{'background': darkerShade}"
           v-html="selectedObject.name"></h1>
       <br>
-      <h2 v-bind:style="{'background':colors['shade']}"
+      <h2 v-bind:style="{'background':colors['color']}"
           v-html="selectedObject.artist"></h2>
       <br>
-      <h4 v-bind:style="{'background':colors['shade']}"
+      <h4 v-if="selectedObject.genre.length > 0"
+          v-bind:style="{'background':colors['color']}"
           v-html="selectedObject.genre"></h4>
     </div>
 
@@ -29,22 +29,25 @@
       <h4 class="infoPanel_listWrapper__header">Playlist Appearances
         ({{Object.keys(selectedObject.playlists).length}})</h4>
 
-      <div class="infoPanel_listWrapper__item"
-           v-for="(duration) in durationCalculation">
+      <div v-for="(duration) in durationCalculation"
+           class="infoPanel_listWrapper__item">
         <p
           class="infoPanel_listWrapper__dates"
-          v-bind:style="{'background': darkerShade}"><a
-          class="infoPanel_listItemLink"
-          v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
-        truncateYear(duration.initialDate)}}</a>
-        <template v-if="duration.finalDate">&ndash;<a
-          class="infoPanel_listItemLink"
-          v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
-          truncateMonth(duration.finalDate)}}</a>
-        </template>
-          </p>
+          v-bind:style="{'background': darkerShade}">
+          <a
+            class="infoPanel_listItemLink"
+            v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
+            truncateYear(duration.initialDate)}}</a>
+          <template v-if="duration.finalDate">
+            &ndash;
+            <a
+              class="infoPanel_listItemLink"
+              v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
+              truncateMonth(duration.finalDate)}}</a>
+          </template>
+        </p>
         <br>
-        <p v-bind:style="{'background': colors['shade']}">About {{duration.duration}}</p>
+        <p v-bind:style="{'background': colors['color']}">About {{duration.duration}}</p>
 
 
       </div>
@@ -59,6 +62,7 @@
 <script>
   import { mapState } from "vuex";
   import moment from 'moment';
+  import { colorMixin } from "../../mixins/colors";
 
   export default {
     name: 'InfoPanel',
@@ -69,6 +73,7 @@
     data() {
       return {};
     },
+    mixins: [colorMixin],
     computed: {
       ...mapState([
         'songs',
@@ -76,15 +81,10 @@
         'songByAppearances'
       ]),
       darkerShade: function () {
-        const nudge = 50;
+        const shadeTint = this.getTintShade(this.colors.original.color, 0.6, 'l');
 
-        const shade = {
-          r: Math.max(this.colors.original.color.r - nudge, 0),
-          g: Math.max(this.colors.original.color.g - nudge, 0),
-          b: Math.max(this.colors.original.color.b - nudge, 0)
-        };
 
-        return '#' + shade.r.toString(16) + shade.g.toString(16) + shade.b.toString(16);
+        return this.objectToHex(shadeTint.shade);
       },
       selectedObject: function () {
         return this.songs[this.objectID];
@@ -201,6 +201,7 @@
         font-size: 2rem;
         line-height: 2rem;
       }
+
       * {
         display: inline-block;
         padding: 0 map_get($spacers, 2) map_get($spacers, 2);
@@ -224,6 +225,7 @@
 
       &__item {
         margin-bottom: map_get($spacers, 2);
+
         p {
           display: inline-block;
           font-size: 1rem;
@@ -241,7 +243,6 @@
     &_listItemLink {
       font-weight: bold;
     }
-
 
 
   }
