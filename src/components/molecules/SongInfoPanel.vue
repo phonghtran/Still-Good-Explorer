@@ -9,9 +9,7 @@
         </a>
       </p>
 
-      <div
-        class="infoPanel_header"
-      >
+      <div class="infoPanel_header">
         <h1 v-bind:style="{'background': colors['hex']['shade']}"
             v-html="selectedObject.name"></h1>
         <br>
@@ -24,6 +22,7 @@
       </div>
 
       <playlist-appearances-list
+        class="infoPanel_playlists"
         v-bind:song="selectedObject"
         v-bind:durationsObject="durationCalculation[objectID]"
         v-bind:colors="colors"
@@ -102,7 +101,7 @@
     }
 
     &_header {
-      margin: map_get($spacers, 5) 0 map_get($spacers, 3);
+      margin: map_get($spacers, 5) 0 0;
 
       h1 {
         font-size: 2rem;
@@ -116,10 +115,9 @@
       }
     }
 
-
-
-
-
+    &_playlists {
+      margin-top: map_get($spacers, 5);
+    }
 
   }
 
