@@ -102,7 +102,7 @@
     }
 
     &_header {
-      margin-top: map_get($spacers, 5);
+      margin: map_get($spacers, 5) 0 map_get($spacers, 3);
 
       h1 {
         font-size: 2rem;
