@@ -16,7 +16,7 @@
     ],
     computed: {
       color: function (){
-        const colors = this.generateColor();
+        const colors = this.generateColor(0.2);
 
         return colors.hex.color;
       }

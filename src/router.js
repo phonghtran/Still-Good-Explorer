@@ -15,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'index',
-      component: Songs,
+      component: Playlists,
       meta: {
         title: 'Home'
       }

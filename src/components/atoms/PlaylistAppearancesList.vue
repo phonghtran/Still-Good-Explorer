@@ -1,5 +1,10 @@
 <template>
-  <div>
+
+  <div class="infoPanel_listWrapper">
+
+    <h4 class="infoPanel_listWrapper__header">Playlist Appearances
+      ({{Object.keys(song.playlists).length}})</h4>
+
     <div v-for="item in durationsObject"
          class="infoPanel_listWrapper__item">
       <p
@@ -9,14 +14,14 @@
           <a
             class="infoPanel_listItemLink"
             v-on:click.prevent="jumpToPlaylist(item.finalDate)">{{item.finalDate |
-              truncateYear(item.initialDate)}}</a>
+            truncateYear(item.initialDate)}}</a>
 
           &ndash;
         </template>
         <a
           class="infoPanel_listItemLink"
           v-on:click.prevent="jumpToPlaylist(item.initialDate)">{{item.initialDate |
-            truncateMonth(item.finalDate)}}</a>
+          truncateMonth(item.finalDate)}}</a>
 
       </p>
       <br>
@@ -24,7 +29,13 @@
 
 
     </div>
+
   </div>
+
+
+
+
+
 </template>
 
 <script>
@@ -34,8 +45,10 @@
     name: "PlaylistAppearancesList",
     props: {
       durationsObject: {},
-      colors: Object
+      colors: Object,
+      song: {}
     },
+
     mixins: [
 
       stringMixin
@@ -51,18 +64,48 @@
 <style scoped lang="scss">
   @import "@/styles/main.scss";
 
-  .infoPanel_listWrapper__item {
-    color: $white;
-    margin-bottom: map_get($spacers, 2);
+  .infoPanel {
+    &_listWrapper {
+      color: $white;
 
-    p {
-      display: inline-block;
-      font-size: 1rem;
-      line-height: 1.25rem;
-      margin-bottom: 0;
-      padding: map_get($spacers, 1) map_get($spacers, 2);
+      padding: 0 0 map_get($spacers, 4);
+
+      &__header {
+        display: inline-block;
+        margin-bottom: map_get($spacers, 3);
+      }
+
+      &__dates {
+        padding: 0 map_get($spacers, 2);
+      }
+
+      &__item {
+
+        margin-bottom: map_get($spacers, 2);
+
+        p {
+          display: inline-block;
+          font-size: 1rem;
+          line-height: 1.25rem;
+          margin-bottom: 0;
+          padding: map_get($spacers, 1) map_get($spacers, 2);
+        }
+      }
+    }
+
+
+    &_list {
+      padding: 0;
+    }
+
+    &_listItemLink {
+      font-weight: bold;
     }
   }
+
+
+
+
 
   a, a:not([href]), a:not([href]):not([tabindex]) {
 

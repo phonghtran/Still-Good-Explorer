@@ -38,7 +38,7 @@ export const colorMixin = {
 
       return convertedHSL;
     },
-    generateColor: function (percentage, mode = 'l') {
+    generateColor: function (percentage = '0.2', mode = 'l') {
       const threshold = 105; // larger = wider range of colors
       const offset = 100; // higher = lighter the color
 
@@ -94,8 +94,9 @@ export const colorMixin = {
       return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + alpha + ')';
     }
     ,
-    getTintShade: function (originalRGB, percentage, mode = 'l') {
+    getTintShade: function (originalRGB, percentage = 0.2, mode = 'l') {
       const originalHSL = this.getHSL(originalRGB);
+
 
       let shadeTint = {
         shade: {},
@@ -139,15 +140,18 @@ export const colorMixin = {
 
       } else {
         const l = originalHSL.l;
-        delta = l - percentage;
-        tempHSL.l = Math.max(0, delta);
-        shadeTint.shade = this.HSLtoRGB(tempHSL);
-        shadeTint.shade.hsl = tempHSL;
 
         delta = l + percentage;
         tempHSL.l = Math.min(1, delta);
         shadeTint.tint = this.HSLtoRGB(tempHSL);
         shadeTint.tint.hsl = tempHSL;
+
+        delta = l - percentage;
+        tempHSL.l = Math.max(0, delta);
+        shadeTint.shade = this.HSLtoRGB(tempHSL);
+        shadeTint.shade.hsl = tempHSL;
+
+
 
       }
 
@@ -160,7 +164,7 @@ export const colorMixin = {
 
       if (targetHSL.s === 0) {
         const gray = Math.ceil(targetHSL.l * 255);
-        newRGB = {
+        return {
           r: gray,
           g: gray,
           b: gray
@@ -215,9 +219,10 @@ export const colorMixin = {
           };
         }
 
+        return newRGB;
       } // if
 
-      return newRGB;
+
     }
     ,
     generateLinearGradient: function (colorSet) {

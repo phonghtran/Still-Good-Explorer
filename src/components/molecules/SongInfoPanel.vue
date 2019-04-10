@@ -23,21 +23,13 @@
             v-html="selectedObject.genre"></h4>
       </div>
 
-      <div class="infoPanel_listWrapper">
+      <playlist-appearances-list
+        v-bind:song="selectedObject"
+        v-bind:durationsObject="durationCalculation[objectID]"
+        v-bind:colors="colors"
+        @jumpToPlaylist="jumpToPlaylist">
 
-        <h4 class="infoPanel_listWrapper__header">Playlist Appearances
-          ({{Object.keys(selectedObject.playlists).length}})</h4>
-
-        <playlist-appearances-list
-          v-bind:durationsObject="durationCalculation[objectID]"
-          v-bind:colors="colors"
-          @jumpToPlaylist="jumpToPlaylist">
-
-        </playlist-appearances-list>
-
-
-
-      </div>
+      </playlist-appearances-list>
 
 
     </div>
@@ -125,39 +117,8 @@
     }
 
 
-    &_listWrapper {
 
-      padding: map_get($spacers, 5) 0 map_get($spacers, 4);
 
-      &__header {
-        display: inline-block;
-        margin-bottom: map_get($spacers, 3);
-      }
-
-      &__dates {
-        padding: 0 map_get($spacers, 2);
-      }
-
-      &__item {
-        margin-bottom: map_get($spacers, 2);
-
-        p {
-          display: inline-block;
-          font-size: 1rem;
-          line-height: 1.25rem;
-          margin-bottom: 0;
-          padding: map_get($spacers, 1) map_get($spacers, 2);
-        }
-      }
-    }
-
-    &_list {
-      padding: 0;
-    }
-
-    &_listItemLink {
-      font-weight: bold;
-    }
 
 
   }

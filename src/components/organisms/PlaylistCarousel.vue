@@ -139,11 +139,9 @@
       },
       playlistStyle: function () {
         let newArray = {};
-        const percentage = 0.2;
 
         for (let playlist in this.playlists) {
-
-          newArray[playlist] =  this.generateColor(percentage,'l');
+          newArray[playlist] =  this.generateColor(0.2);
 
         }
 
