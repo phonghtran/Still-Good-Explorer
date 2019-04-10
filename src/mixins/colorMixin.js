@@ -38,20 +38,36 @@ export const colorMixin = {
 
       return convertedHSL;
     },
-    generateColor: function () {
+    generateColor: function (percentage, mode = 'l') {
       const threshold = 105; // larger = wider range of colors
       const offset = 100; // higher = lighter the color
 
+      // skewing purples with 0.25 green and 0.75 blue
       const r = Math.floor(Math.random() * threshold + offset);
       const g = Math.floor(Math.random() * threshold + offset * 0.25);
       const b = Math.floor(Math.random() * threshold + offset * 0.75);
 
-      // skewing purples with 0.25 green and 0.75 blue
-      return {
+      const color = {
         r: r,
         g: g,
         b: b,
         hsl: this.getHSL({r, g, b})
+      };
+
+      const tintShade = this.getTintShade(color, percentage, mode);
+
+
+      return {
+        hex: {
+          color: this.objectToHex(color),
+          shade: this.objectToHex(tintShade.shade),
+          tint: this.objectToHex(tintShade.tint),
+        },
+        original: {
+          color: color,
+          shade: tintShade.shade,
+          tint: tintShade.tint
+        }
       };
     },
     objectToHex: function (obj) {
@@ -72,10 +88,12 @@ export const colorMixin = {
       }
 
       return '#' + r + g + b;
-    },
+    }
+    ,
     objectToRGBA: function (obj, alpha) {
       return 'rgba(' + obj.r + ',' + obj.g + ',' + obj.b + ',' + alpha + ')';
-    },
+    }
+    ,
     getTintShade: function (originalRGB, percentage, mode = 'l') {
       const originalHSL = this.getHSL(originalRGB);
 
@@ -135,7 +153,8 @@ export const colorMixin = {
 
 
       return shadeTint;
-    },
+    }
+    ,
     HSLtoRGB: function (targetHSL) {
       let newRGB;
 
@@ -199,10 +218,12 @@ export const colorMixin = {
       } // if
 
       return newRGB;
-    },
+    }
+    ,
     generateLinearGradient: function (colorSet) {
-      return 'linear-gradient(' + colorSet.hex.color + ', ' + colorSet.hex.shade + ')'
-    },
+      return 'linear-gradient(' + colorSet.hex.color + ', ' + colorSet.hex.shade + ')';
+    }
+    ,
     generateRadialGradient: function (colorSet) {
       return 'radial-gradient( ' +
         this.objectToRGBA(colorSet.original.color, 0.5) + ' 20%, ' +
@@ -223,7 +244,7 @@ export const colorMixin = {
         'radial-gradient( farthest-side at top left, ' +
         this.objectToRGBA(colorSet.original.tint, 1) + ' 50%,' +
         this.objectToRGBA(colorSet.original.shade, 0.8) + ' 80%,' +
-        ' transparent ),'+
+        ' transparent ),' +
         'radial-gradient( farthest-side at bottom right, ' +
         this.objectToRGBA(colorSet.original.shade, 1) + ' 20%,' +
         this.objectToRGBA(colorSet.original.color, 1) + ' 66%,' +

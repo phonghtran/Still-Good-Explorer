@@ -50,10 +50,10 @@
 
 <script>
   import { mapGetters, mapState } from "vuex";
-  import moment from 'moment';
-  import SongInfoPanel from "./molecules/SongInfoPanel";
-  import { colorMixin } from "../mixins/colors";
-  import PlaylistTimeline from "./molecules/PlaylistTimeline";
+  import moment from 'moment/moment';
+  import SongInfoPanel from "../molecules/SongInfoPanel";
+  import { colorMixin } from "../../mixins/colorMixin";
+  import PlaylistTimeline from "../molecules/PlaylistTimeline";
 
   export default {
     name: 'PlaylistCarousel',
@@ -73,8 +73,7 @@
         'playlists'
       ]),
       ...mapGetters([
-        'playlistDates',
-        'playlistDurations'
+
       ]),
       playlistPositions: function () {
         const playlists = document.querySelectorAll('.playlistCarousel_playlist');
@@ -143,22 +142,9 @@
         const percentage = 0.2;
 
         for (let playlist in this.playlists) {
-          const colors =  this.generateColor();
 
-          const shadeTint = this.getTintShade(colors,percentage,'l');
+          newArray[playlist] =  this.generateColor(percentage,'l');
 
-          newArray[playlist] = {
-            hex: {
-              color: this.objectToHex(colors),
-              shade: this.objectToHex(shadeTint.shade),
-              tint: this.objectToHex(shadeTint.tint),
-            },
-            original: {
-              color: colors,
-              shade: shadeTint.shade,
-              tint: shadeTint.tint
-            }
-          };
         }
 
         return newArray;
@@ -284,8 +270,8 @@
 
         const gradient = ctx.createLinearGradient(origin.x + radius, origin.y, target.x - radius, target.y);
 
-        gradient.addColorStop(0, colors.origin.tint);
-        gradient.addColorStop(1, colors.target.tint);
+        gradient.addColorStop(0, colors.origin.hex.tint);
+        gradient.addColorStop(1, colors.target.hex.tint);
 
         ctx.lineWidth = 2;
         ctx.strokeStyle = gradient;
@@ -296,8 +282,8 @@
         ctx.lineTo(target.x - radius, target.y);
         ctx.stroke();
 
-        ctx.strokeStyle = colors.origin.tint;
-        ctx.fillStyle = colors.origin.color;
+        ctx.strokeStyle = colors.origin.hex.tint;
+        ctx.fillStyle = colors.origin.hex.color;
         ctx.beginPath();
         ctx.ellipse(origin.x, origin.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();
@@ -305,7 +291,7 @@
 
 
 
-        ctx.strokeStyle = colors.target.tint;
+        ctx.strokeStyle = colors.target.hex.tint;
         ctx.fillStyle = colors.target.color;
         ctx.beginPath();
         ctx.ellipse(target.x, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);

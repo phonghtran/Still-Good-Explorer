@@ -8,7 +8,7 @@
 
 <script>
 // @ is an alias to /src
-import PlaylistCarousel from '@/components/PlaylistCarousel.vue';
+import PlaylistCarousel from '../components/organisms/PlaylistCarousel.vue';
 
 export default {
 

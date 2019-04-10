@@ -46,8 +46,7 @@
         'songByAppearances'
       ]),
       ...mapGetters([
-        'playlistDates',
-        'playlistDurations'
+
       ])
     },
     methods: {

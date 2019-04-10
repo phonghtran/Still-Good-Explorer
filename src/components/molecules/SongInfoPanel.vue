@@ -28,30 +28,13 @@
         <h4 class="infoPanel_listWrapper__header">Playlist Appearances
           ({{Object.keys(selectedObject.playlists).length}})</h4>
 
-        <div v-for="(duration) in durationCalculation"
-             class="infoPanel_listWrapper__item">
-          <p
-            class="infoPanel_listWrapper__dates"
-            v-bind:style="{'background': colors['hex']['shade']}">
-            <template v-if="duration.finalDate">
-              <a
-                class="infoPanel_listItemLink"
-                v-on:click.prevent="jumpToPlaylist(duration.finalDate)">{{duration.finalDate |
-                  truncateYear(duration.initialDate)}}</a>
+        <playlist-appearances-list
+          v-bind:durationsObject="durationCalculation[objectID]"
+          v-bind:colors="colors"
+          @jumpToPlaylist="jumpToPlaylist">
 
-              &ndash;
-            </template>
-            <a
-              class="infoPanel_listItemLink"
-              v-on:click.prevent="jumpToPlaylist(duration.initialDate)">{{duration.initialDate |
-                truncateMonth(duration.finalDate)}}</a>
+        </playlist-appearances-list>
 
-          </p>
-          <br>
-          <p v-bind:style="{'background': colors['hex']['color']}">About {{duration.duration}}</p>
-
-
-        </div>
 
 
       </div>
@@ -62,12 +45,14 @@
 </template>
 
 <script>
-  import { mapState } from "vuex";
-  import moment from 'moment';
-  import { colorMixin } from "../../mixins/colors";
+  import { mapState, mapGetters } from "vuex";
+  import { colorMixin } from "../../mixins/colorMixin";
+  import { stringMixin } from "../../mixins/stringMixin";
+  import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList";
 
   export default {
     name: 'SongInfoPanel',
+    components: {PlaylistAppearancesList},
     props: {
       objectID: String,
       colors: Object
@@ -75,78 +60,21 @@
     data() {
       return {};
     },
-    mixins: [colorMixin],
+    mixins: [
+      colorMixin,
+      stringMixin
+    ],
     computed: {
       ...mapState([
         'songs',
         'playlists',
         'songByAppearances'
       ]),
-
+      ...mapGetters([
+        'durationCalculation'
+      ]),
       selectedObject: function () {
         return this.songs[this.objectID];
-      },
-      durationCalculation: function () {
-        const playlists = this.songs[this.objectID].playlists;
-        const keys = Object.keys(playlists);
-
-        const masterPlaylistsKeys = Object.keys(this.playlists);
-        const defaultMessage = '<1 week';
-
-
-        if (keys.length > 1) {
-          let anchorDate = 0;
-          let prevIndex = masterPlaylistsKeys.indexOf(keys[0]);
-          let durationCurrentIndex = 0;
-          let durations = [];
-
-
-          for (let keyIndex = 1; keyIndex < keys.length; keyIndex++) {
-            const thisCurrentIndex = masterPlaylistsKeys.indexOf(keys[keyIndex]);
-
-
-            if (typeof durations[durationCurrentIndex] === 'undefined') {
-              durations[durationCurrentIndex] = {
-                duration: defaultMessage,
-                playlists: [],
-                initialDate: keys[anchorDate]
-              };
-            }
-
-            if (thisCurrentIndex - prevIndex === 1) {
-              const thisDate = moment(keys[keyIndex]);
-
-              durations[durationCurrentIndex].duration = thisDate.from(moment(keys[anchorDate]), true);
-              durations[durationCurrentIndex].finalDate = keys[keyIndex];
-            } else {
-              durationCurrentIndex++;
-              anchorDate = keyIndex;
-
-              durations[durationCurrentIndex] = {
-                duration: '<1 week',
-                playlists: [],
-                initialDate: keys[keyIndex]
-              };
-            }
-
-            durations[durationCurrentIndex].playlists.push(keys[keyIndex]);
-
-            prevIndex = thisCurrentIndex;
-          }
-
-          return durations;
-        }
-
-
-
-        return [{
-          duration: defaultMessage,
-          playlists: [
-            keys[0]
-          ],
-          initialDate: keys[0]
-        }];
-
       }
     },
     methods: {
@@ -155,27 +83,6 @@
       },
       jumpToPlaylist: function (key) {
         this.$emit('jumpToPlaylist', key);
-      }
-    },
-    filters: {
-      truncateYear: function (iniitialDate, compareDate) {
-        if (moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY')) {
-          return moment(iniitialDate).format("MMM D");
-        }
-
-        return moment(iniitialDate).format("MMM Do, YYYY");
-
-      },
-      truncateMonth: function (iniitialDate, compareDate) {
-
-        if (moment(iniitialDate).format('MMM') === moment(compareDate).format('MMM') &&
-          moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY') &&
-          typeof compareDate !== 'undefined') {
-          return moment(iniitialDate).format("Do, YYYY");
-        }
-
-        return moment(iniitialDate).format("MMM Do, YYYY");
-
       }
     }
   };

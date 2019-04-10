@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Playlists from './views/Playlists.vue';
 import Stats from './views/Stats.vue';
-
+import Songs from './views/Songs.vue';
 
 Vue.use(Router);
 
@@ -15,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'index',
-      component: Playlists,
+      component: Songs,
       meta: {
         title: 'Home'
       }
@@ -27,6 +27,14 @@ const router = new Router({
       component: Playlists,
       meta: {
         title: 'Playlists'
+      }
+    },
+    {
+      path: '/songs',
+      name: 'songs',
+      component: Songs,
+      meta: {
+        title: 'Songs'
       }
     },
     {

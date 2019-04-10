@@ -1,19 +1,26 @@
 <template>
-  <div id="nav" class="d-flex" v-bind:style="{backgroundColor: objectToHex(generateColor())}">
+  <div id="nav" class="d-flex" v-bind:style="{backgroundColor: color}">
     <router-link to="/playlists">Playlists</router-link>
-    <router-link to="/stats">Stats</router-link>
+    <router-link to="/songs">Songs</router-link>
   </div>
 
 </template>
 
 <script>
-  import { colorMixin } from "../../mixins/colors";
+  import { colorMixin } from "../../mixins/colorMixin";
 
   export default {
     name: "NavMain",
     mixins: [
       colorMixin
-    ]
+    ],
+    computed: {
+      color: function (){
+        const colors = this.generateColor();
+
+        return colors.hex.color;
+      }
+    }
   };
 </script>
 

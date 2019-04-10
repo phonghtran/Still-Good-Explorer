@@ -30,7 +30,7 @@
 
 <script>
 
-  import { colorMixin } from "../mixins/colors";
+  import { colorMixin } from "../mixins/colorMixin";
 
   export default {
 

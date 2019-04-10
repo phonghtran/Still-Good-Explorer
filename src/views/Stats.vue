@@ -8,7 +8,7 @@
 
 <script>
 // @ is an alias to /src
-import StatsAnalysis from '@/components/StatsAnalysis.vue';
+import StatsAnalysis from '../components/organisms/StatsAnalysis.vue';
 
 export default {
 
