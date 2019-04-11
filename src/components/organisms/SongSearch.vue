@@ -182,6 +182,10 @@
   .search {
     &_wrapper {
       margin-bottom: map_get($spacers, 4);
+      position: sticky;
+      position: -webkit-sticky;
+      top:  map_get($spacers, 6);
+      z-index: $zindex-sticky;
     }
 
     &_textBox {
@@ -208,7 +212,7 @@
 
     &_header {
       color: $white;
-      margin: map_get($spacers, 3) 0;
+      margin: map_get($spacers, 3) 0 map_get($spacers, 5);
 
       h1 {
         font-size: 1.25rem;

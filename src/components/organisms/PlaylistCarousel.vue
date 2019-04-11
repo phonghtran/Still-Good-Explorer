@@ -41,8 +41,9 @@
 
           </li>
         </ol>
-
       </div>
+
+      <div>&nbsp;</div>
     </div>
 
   </div>
@@ -312,7 +313,7 @@
 
   .playlistCarousel {
     &_wrapper {
-
+      margin-right: 4rem;
     }
 
     &_playlistContainer {
