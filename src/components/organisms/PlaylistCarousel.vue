@@ -173,11 +173,15 @@
 
         for (let index = 0; index < playlists.length; index++) {
           if (playlists[index].getAttribute('date').indexOf(targetDate) !== -1) {
-
-            window.scrollTo(playlists[index].offsetLeft - offsetNudge, 0);
-            break;
+            if (index === 0 || (index > 0 && moment(playlists[index].getAttribute('date')).format('M') < 6)){
+              window.scrollTo(playlists[index].offsetLeft - offsetNudge, 0);
+              return false;
+            }
           }
         }
+        
+        window.scrollTo(playlists[playlists.length - 1].offsetLeft - offsetNudge, 0);
+
       },
       selectTrack(newTrack) {
         this.selectedTrack = newTrack;

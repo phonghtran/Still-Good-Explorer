@@ -7,7 +7,7 @@
         v-for="button in buttonDates"
         class="buttonYear"
         @click="scrollTo(button)">
-        {{button}}
+        {{button | ageFormat }}
       </button>
 
     </div>
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+  import moment from 'moment';
+
   export default {
     name: "PlaylistTimeline",
     data() {
@@ -42,6 +44,18 @@
       },
       toggleOpen: function () {
         this.isOpen = !this.isOpen;
+      }
+    },
+    filters: {
+      ageFormat: function (val) {
+        let prefix = '';
+        let suffix = '';
+
+        if (val === moment().format('YYYY')){
+          prefix = 'Today ('
+          suffix = ' Years)';
+        }
+        return prefix + (val - 1986) + suffix;
       }
     }
   };
@@ -175,7 +189,10 @@
 
         button {
           border-bottom: $border-style;
+          //border-right: $border-style;
           border-top: $border-style;
+          flex: 1 1 auto;
+
 
           &.toggleOpen {
             display: none;
@@ -194,8 +211,12 @@
 
 
           &:nth-child(2) {
+
             border-left: $border-style;
+
+
             border-radius: $border-radius 0 0 $border-radius;
+            flex: 1 0 auto;
           }
 
           &:last-child {
