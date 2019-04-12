@@ -214,8 +214,6 @@
           const pos = this.playlistPositions[i];
 
           if (pos > w.x - w.w * 0.5 && pos + (w.w / 3) < w.x + w.w * 2) {
-
-
             const currentPlaylist = playlists[currentIndex];
             const compareToPlaylist = playlists[currentIndex + 1];
 
@@ -223,13 +221,12 @@
 
             const checkMatches = this.playlistMatches[currentDate];
 
-
             const colors = {
               origin: this.playlistStyle[currentDate],
               target: this.playlistStyle[compareToPlaylist.getAttribute('date')]
             };
 
-            if (currentPlaylist.hasChildNodes() && compareToPlaylist.hasChildNodes()) {
+            if (currentPlaylist.childNodes[1].hasChildNodes() && compareToPlaylist.childNodes[1].hasChildNodes()) {
               const currentChildren = currentPlaylist.childNodes[1].childNodes;
               const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
 
@@ -288,10 +285,8 @@
         ctx.fill();
 
 
-
-
         ctx.strokeStyle = colors.target.hex.tint;
-        ctx.fillStyle = colors.target.color;
+        ctx.fillStyle = colors.target.hex.color;
         ctx.beginPath();
         ctx.ellipse(target.x, target.y, radius, radius, Math.PI / 4, 0, 2 * Math.PI);
         ctx.fill();

@@ -4,11 +4,10 @@
     <div class=" d-flex flex-wrap">
       <div class="search_wrapper col-12">
         <input
+          v-model="filteredSongs"
           class="search_textBox"
           placeholder="Search..."
           v-bind:style="{'background-color':  searchColor['hex']['tint'], 'border-color': searchColor['hex']['color'] }"
-          v-model="filteredSongs"
-
           type="text">
       </div>
 
