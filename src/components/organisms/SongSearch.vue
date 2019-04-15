@@ -28,19 +28,24 @@
           <div class="songItem_header">
             <h1
               class="songItem_name"
-              v-bind:style="{'background': songStyle[song.trackID]['hex']['shade']}"
-              v-html="song.name"></h1>
+              v-bind:style="{'background': songStyle[song.trackID]['hex']['shade']}">
+              {{song.name |decodeASCII}}
+            </h1>
             <br>
             <h2
               class="songItem_artist"
               v-bind:style="{'background': songStyle[song.trackID]['hex']['color']}"
-              v-html="song.artist"></h2>
+              @click="setSearch(song.artist)">
+              {{song.artist |decodeASCII}}
+            </h2>
             <br>
             <h4
               v-if="song.genre.length > 0"
               class="songItem_genre"
               v-bind:style="{'background': songStyle[song.trackID]['hex']['color']}"
-              v-html="song.genre"></h4>
+              @click="setSearch(song.genre)">
+              {{song.genre | decodeASCII}}
+            </h4>
 
           </div>
 
@@ -168,7 +173,10 @@
       }
     },
     methods: {
-
+      setSearch: function (term) {
+        window.scrollTo(0, 0);
+        this.filteredSongs = term;
+      }
     },
     filters: {}
   };
@@ -236,11 +244,11 @@
     }
 
     &_artist {
-
+      cursor: pointer;
     }
 
     &_genre {
-
+      cursor: pointer;
     }
   }
 </style>

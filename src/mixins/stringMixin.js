@@ -20,6 +20,12 @@ export const stringMixin = {
 
       return moment(iniitialDate).format("MMM Do, YYYY");
 
+    },
+    decodeASCII: function (val){
+      let e = document.createElement('textarea');
+      e.innerHTML = val;
+      // handle case of empty input
+      return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
     }
   }
 };

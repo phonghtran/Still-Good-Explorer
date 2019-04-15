@@ -52,7 +52,7 @@
         let suffix = '';
 
         if (val === moment().format('YYYY')){
-          prefix = 'Today ('
+          prefix = 'Today (';
           suffix = ' Years)';
         }
         return prefix + (val - 1986) + suffix;

@@ -8,16 +8,16 @@
           <div class="swatch d-flex" v-bind:style="{'background-color': hex}">
 
             <div
-              v-bind:style="{color: textColorTest(item['original'][key])}">
+              v-bind:style="{color: textColorTest(item['rgb'][key])}">
               <p>{{key}}</p>
               <p>{{hex}}</p>
-              <p> {{item['original'][key]['r']}}<br>{{item['original'][key]['g']}}<br>{{item['original'][key]['b']}}
+              <p> {{item['rgb'][key]['r']}}<br>{{item['rgb'][key]['g']}}<br>{{item['rgb'][key]['b']}}
               </p>
               <p>
-                {{item['original'][key]['hsl']['h']}}<br>{{item['original'][key]['hsl']['s']}}<br>{{item['original'][key]['hsl']['l']}}
+                {{item['rgb'][key]['hsl']['h']}}<br>{{item['rgb'][key]['hsl']['s']}}<br>{{item['rgb'][key]['hsl']['l']}}
               </p>
               <p>
-                {{item['original'][key]['change']}}
+                {{item['rgb'][key]['change']}}
               </p>
             </div>
           </div>
@@ -61,7 +61,7 @@
 
             },
 
-            original: {
+            rgb: {
               color: colors,
 
               ss: saturation.shade,

@@ -63,7 +63,7 @@ export const colorMixin = {
           shade: this.objectToHex(tintShade.shade),
           tint: this.objectToHex(tintShade.tint),
         },
-        original: {
+        rgb: {
           color: color,
           shade: tintShade.shade,
           tint: tintShade.tint
@@ -232,28 +232,28 @@ export const colorMixin = {
     ,
     generateRadialGradient: function (colorSet) {
       return 'radial-gradient( ' +
-        this.objectToRGBA(colorSet.original.color, 0.5) + ' 20%, ' +
-        this.objectToRGBA(colorSet.original.color, 0.25) + ' 35%,' +
+        this.objectToRGBA(colorSet.rgb.color, 0.5) + ' 20%, ' +
+        this.objectToRGBA(colorSet.rgb.color, 0.25) + ' 35%,' +
         'transparent ),' +
         'radial-gradient( farthest-side at bottom left, ' +
-        this.objectToRGBA(colorSet.original.shade, 1) + ' 20%, ' +
-        this.objectToRGBA(colorSet.original.shade, 0.5) + ' 50%,' +
-        this.objectToRGBA(colorSet.original.shade, 0.25) + ' 70%, ' +
+        this.objectToRGBA(colorSet.rgb.shade, 1) + ' 20%, ' +
+        this.objectToRGBA(colorSet.rgb.shade, 0.5) + ' 50%,' +
+        this.objectToRGBA(colorSet.rgb.shade, 0.25) + ' 70%, ' +
         'transparent ),' +
         'radial-gradient( farthest-side at top right, ' +
-        this.objectToRGBA(colorSet.original.tint, 1) + ' 0, ' +
-        this.objectToRGBA(colorSet.original.tint, 0.8) + ' 33%, ' +
-        this.objectToRGBA(colorSet.original.color, 0.5) + ' 50%,' +
-        this.objectToRGBA(colorSet.original.tint, 0.58) + ' 68%, ' +
-        this.objectToRGBA(colorSet.original.color, 0.25) + ' 80%,' +
+        this.objectToRGBA(colorSet.rgb.tint, 1) + ' 0, ' +
+        this.objectToRGBA(colorSet.rgb.tint, 0.8) + ' 33%, ' +
+        this.objectToRGBA(colorSet.rgb.color, 0.5) + ' 50%,' +
+        this.objectToRGBA(colorSet.rgb.tint, 0.58) + ' 68%, ' +
+        this.objectToRGBA(colorSet.rgb.color, 0.25) + ' 80%,' +
         'transparent ),' +
         'radial-gradient( farthest-side at top left, ' +
-        this.objectToRGBA(colorSet.original.tint, 1) + ' 50%,' +
-        this.objectToRGBA(colorSet.original.shade, 0.8) + ' 80%,' +
+        this.objectToRGBA(colorSet.rgb.tint, 1) + ' 50%,' +
+        this.objectToRGBA(colorSet.rgb.shade, 0.8) + ' 80%,' +
         ' transparent ),' +
         'radial-gradient( farthest-side at bottom right, ' +
-        this.objectToRGBA(colorSet.original.shade, 1) + ' 20%,' +
-        this.objectToRGBA(colorSet.original.color, 1) + ' 66%,' +
+        this.objectToRGBA(colorSet.rgb.shade, 1) + ' 20%,' +
+        this.objectToRGBA(colorSet.rgb.color, 1) + ' 66%,' +
         ' transparent )';
 
 

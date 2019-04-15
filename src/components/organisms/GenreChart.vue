@@ -5,13 +5,18 @@
       <ul class="genreChart_genreList">
         <li
           v-for="(genre, key) in genresCoordinates"
+          class="d-flex justify-content-between align-items-center"
+          v-bind:style="{'background-color': genre.style.hex.color }"
           @click="setTargetGenre(key)"
           @mouseenter="setTargetGenre(key)"
           @mouseleave="setTargetGenre('')">
 
-          <div class="genreChart_swatch"  v-bind:style="{'background-color': genre.style.hex.color }"></div>
+          <span>{{key || decodeASCII}}</span>
 
-          {{key || decodeASCII}} ({{Object.keys(genre.playlists).length}})
+          <div class="genreChart_swatch" v-bind:style="{'background-color': genre.style.hex.shade  }">
+            {{Object.keys(genre.playlists).length}}
+          </div>
+
         </li>
       </ul>
     </div>
@@ -21,6 +26,7 @@
 <script>
   import { mapState } from "vuex";
   import { colorMixin } from "../../mixins/colorMixin";
+  import { stringMixin } from "../../mixins/stringMixin";
 
   export default {
     name: "GenreChart",
@@ -75,7 +81,10 @@
         return genres;
       }
     },
-    mixins: [colorMixin],
+    mixins: [
+      colorMixin,
+      stringMixin
+    ],
     mounted: function () {
       this.renderChart();
     },
@@ -100,11 +109,11 @@
         let totalHeight = w.h / 2;
 
 
-        if (w.w >= 600){
+        if (w.w >= 600) {
           totalWidth = w.w * 0.6;
           totalHeight = w.h;
 
-          if (w.w >= 1024){
+          if (w.w >= 1024) {
             totalWidth = w.w * 0.8;
           }
         }
@@ -132,7 +141,7 @@
             }
           }
 
-          const color = genre['style']['original']['color'];
+          const color = genre['style']['rgb']['color'];
           const rgba = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha + ')';
 
           ctx.fillStyle = rgba;
@@ -144,7 +153,6 @@
             if (typeof yOffset[playlistIndex] === 'undefined') {
               yOffset[playlistIndex] = 0;
             }
-
 
 
             const xCoor = playlistIndex * rectWidth;
@@ -166,14 +174,7 @@
 
       }
     },
-    filters: {
-      decodeASCII: function (val){
-        let e = document.createElement('textarea');
-        e.innerHTML = val;
-        // handle case of empty input
-        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-      }
-    }
+    filters: {}
   };
 </script>
 
@@ -192,22 +193,30 @@
 
     &_panel {
       margin-top: 60vh;
+      top: 3rem;
     }
 
     &_genreList {
       list-style: none;
       padding: 0;
 
+
+
       li {
-
-
+        color: $white;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 0 0 0 map_get($spacers, 2);
       }
     }
 
     &_swatch {
-      display: inline-block;
-      height: 1rem;
-      width: 1rem;
+      color: $white;
+      font-weight: normal;
+      min-height: 2rem;
+      min-width: 3rem;
+      padding: map_get($spacers, 1) map_get($spacers, 2);
+      text-align: center;
     }
   }
 
@@ -222,8 +231,8 @@
 
       &_panel {
         margin-top: 0;
-        margin-left: 60vw;
-        position: relative;
+        position: absolute;
+        right: 0;
         width: 40vw;
       }
 
@@ -240,8 +249,8 @@
       }
 
       &_panel {
-        margin-left: 80vw;
-        position: relative;
+
+        right: 0;
         width: 20vw;
       }
 
