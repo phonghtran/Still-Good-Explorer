@@ -183,6 +183,7 @@
 
   .genreChart {
     &_canvas {
+      background-color: $white;
       left: 0;
       position: fixed;
       top: 3rem;
