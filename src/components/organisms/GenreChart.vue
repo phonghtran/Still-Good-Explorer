@@ -1,7 +1,20 @@
 <template>
   <div>
     <canvas class="genreChart_canvas"></canvas>
+    <div class="genreChart_panel">
+      <ul class="genreChart_genreList">
+        <li
+          v-for="(genre, key) in genresCoordinates"
+          @click="setTargetGenre(key)"
+          @mouseenter="setTargetGenre(key)"
+          @mouseleave="setTargetGenre('')">
 
+          <div class="genreChart_swatch"  v-bind:style="{'background-color': genre.style.hex.color }"></div>
+
+          {{key || decodeASCII}} ({{Object.keys(genre.playlists).length}})
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -12,7 +25,9 @@
   export default {
     name: "GenreChart",
     data() {
-      return {};
+      return {
+        targetGenre: ''
+      };
     },
     computed: {
       ...mapState([
@@ -65,6 +80,10 @@
       this.renderChart();
     },
     methods: {
+      setTargetGenre: function (newGenre) {
+        this.targetGenre = newGenre;
+        this.renderChart();
+      },
       renderChart: function () {
         const w = {
           x: window.scrollX,
@@ -76,21 +95,47 @@
         const canvas = document.querySelector('.genreChart_canvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+
+        let totalWidth = w.w;
+        let totalHeight = w.h / 2;
+
+
+        if (w.w >= 600){
+          totalWidth = w.w * 0.6;
+          totalHeight = w.h;
+
+          if (w.w >= 1024){
+            totalWidth = w.w * 0.8;
+          }
+        }
+
+
+        canvas.width = totalWidth;
+        canvas.height = totalHeight;
 
         ctx.clearRect(0, 0, w.w, w.h);
 
 
         const playlistCount = Object.keys(this.playlists).length;
         let yOffset = {};
-        let rectWidth = 1 / playlistCount * w.w;
+        let rectWidth = 1 / playlistCount * totalWidth;
 
         for (let genreIndex in this.genresCoordinates) {
           const genre = this.genresCoordinates[genreIndex];
 
-          ctx.fillStyle = genre['style']['hex']['color'];
-          ctx.strokeStyle = genre['style']['hex']['color'];
+          let alpha = 1;
+          if (this.targetGenre !== '') {
+            if (genreIndex === this.targetGenre) {
+              alpha = 1;
+            } else {
+              alpha = 0.15;
+            }
+          }
+
+          const color = genre['style']['original']['color'];
+          const rgba = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha + ')';
+
+          ctx.fillStyle = rgba;
 
 
           for (let playlistPoint in genre.playlists) {
@@ -100,13 +145,14 @@
               yOffset[playlistIndex] = 0;
             }
 
+
+
             const xCoor = playlistIndex * rectWidth;
-            const yCoor = genre.playlists[playlistIndex].percentage * w.h;
+            const yCoor = genre.playlists[playlistIndex].percentage * totalHeight;
 
 
             ctx.beginPath();
             ctx.rect(xCoor, yOffset[playlistIndex], rectWidth, yCoor);
-            // ctx.stroke();
             ctx.fill();
 
 
@@ -119,6 +165,14 @@
         }
 
       }
+    },
+    filters: {
+      decodeASCII: function (val){
+        let e = document.createElement('textarea');
+        e.innerHTML = val;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+      }
     }
   };
 </script>
@@ -127,10 +181,69 @@
   @import "@/styles/main.scss";
 
 
-  .genreChart_canvas {
-    left: 0;
-    position: fixed;
-    top: 3rem;
-    z-index: -1;
+  .genreChart {
+    &_canvas {
+      left: 0;
+      position: fixed;
+      top: 3rem;
+      z-index: $zindex-sticky;
+    }
+
+    &_panel {
+      margin-top: 60vh;
+    }
+
+    &_genreList {
+      list-style: none;
+      padding: 0;
+
+      li {
+
+
+      }
+    }
+
+    &_swatch {
+      display: inline-block;
+      height: 1rem;
+      width: 1rem;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .genreChart {
+      &_canvas {
+        left: 0;
+        position: fixed;
+        top: 3rem;
+        z-index: -1;
+      }
+
+      &_panel {
+        margin-top: 0;
+        margin-left: 60vw;
+        position: relative;
+        width: 40vw;
+      }
+
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .genreChart {
+      &_canvas {
+        left: 0;
+        position: fixed;
+        top: 3rem;
+        z-index: -1;
+      }
+
+      &_panel {
+        margin-left: 80vw;
+        position: relative;
+        width: 20vw;
+      }
+
+    }
   }
 </style>
