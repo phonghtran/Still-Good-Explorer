@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Playlists from './views/Playlists.vue';
 import Stats from './views/Stats.vue';
 import Songs from './views/Songs.vue';
+import Home from './views/Home.vue';
 import Genres from './views/Genres.vue';
 
 Vue.use(Router);
@@ -14,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'index',
-      component: Playlists,
+      component: Home,
       meta: {
         title: 'Home'
       }
