@@ -179,7 +179,7 @@
             }
           }
         }
-        
+
         window.scrollTo(playlists[playlists.length - 1].offsetLeft - offsetNudge, 0);
 
       },

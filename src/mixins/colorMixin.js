@@ -109,13 +109,13 @@ export const colorMixin = {
       if (mode === 's') {
         const s = originalHSL.s;
 
-        delta = s + percentage;
+        delta = parseFloat(s + percentage);
         tempHSL.s = Math.min(1, delta);
         shadeTint.tint = this.HSLtoRGB(tempHSL);
         shadeTint.tint.hsl = tempHSL;
 
 
-        delta = s - percentage;
+        delta = parseFloat(s - percentage);
         tempHSL.s = Math.max(0, delta);
         shadeTint.shade = this.HSLtoRGB(tempHSL);
         shadeTint.shade.hsl = tempHSL;
@@ -141,12 +141,13 @@ export const colorMixin = {
       } else {
         const l = originalHSL.l;
 
-        delta = l + percentage;
+        delta = parseFloat(l + percentage);
         tempHSL.l = Math.min(1, delta);
+
         shadeTint.tint = this.HSLtoRGB(tempHSL);
         shadeTint.tint.hsl = tempHSL;
 
-        delta = l - percentage;
+        delta = parseFloat(l - percentage);
         tempHSL.l = Math.max(0, delta);
         shadeTint.shade = this.HSLtoRGB(tempHSL);
         shadeTint.shade.hsl = tempHSL;

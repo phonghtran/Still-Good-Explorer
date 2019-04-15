@@ -2,6 +2,7 @@
   <div id="nav" class="d-flex" v-bind:style="{backgroundColor: color}">
     <router-link to="/playlists">Playlists</router-link>
     <router-link to="/songs">Songs</router-link>
+    <router-link to="/genres">Genres</router-link>
   </div>
 
 </template>
