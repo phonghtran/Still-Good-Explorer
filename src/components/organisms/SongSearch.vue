@@ -90,7 +90,7 @@
       stringMixin
     ],
     mounted: function () {
-      this.searchList = this.songsAsArray;
+      // this.searchList = this.songsAsArray;
     },
     computed: {
       ...mapState([
