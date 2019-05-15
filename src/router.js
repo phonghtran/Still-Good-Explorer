@@ -15,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'index',
-      component: Home,
+      component: Genres,
       meta: {
         title: 'Home'
       }

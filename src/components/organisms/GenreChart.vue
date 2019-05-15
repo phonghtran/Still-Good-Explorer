@@ -79,6 +79,12 @@
         }
 
         return genres;
+      },
+      genresCoordinatesLength: function () {
+        return Object.keys(this.genresCoordinates).length;
+      },
+      genreKeys: function () {
+        return Object.keys(this.genresCoordinates);
       }
     },
     mixins: [
@@ -129,49 +135,83 @@
         let yOffset = {};
         let rectWidth = 1 / playlistCount * totalWidth;
 
-        for (let genreIndex in this.genresCoordinates) {
-          const genre = this.genresCoordinates[genreIndex];
+        let highlightGenreFlag = false;
+        let targetIndex = 0;
+        let maxLoopCount = 0;
 
-          let alpha = 1;
-          if (this.targetGenre !== '') {
-            if (genreIndex === this.targetGenre) {
-              alpha = 1;
-            } else {
-              alpha = 0.15;
+        if (this.targetGenre !== '') {
+          highlightGenreFlag = true;
+          maxLoopCount = Math.floor(this.genresCoordinatesLength / 2);
+
+
+          for (let genreKey in this.genreKeys) {
+            if (this.genreKeys[genreKey] === this.targetGenre) {
+              targetIndex = parseInt(genreKey);
+              break;
             }
           }
 
-          const color = genre['style']['rgb']['color'];
-          const rgba = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha + ')';
+        }
 
-          ctx.fillStyle = rgba;
+        for (let i = 0; i < this.genresCoordinatesLength; i++) {
+          let alpha = 1;
+          if (highlightGenreFlag === true) {
+            alpha = 0.15;
 
+            if (i !== targetIndex) {
+              const genre = this.genresCoordinates[this.genreKeys[i]];
 
-          for (let playlistPoint in genre.playlists) {
-            const playlistIndex = parseInt(playlistPoint);
-
-            if (typeof yOffset[playlistIndex] === 'undefined') {
-              yOffset[playlistIndex] = 0;
+              yOffset = this.renderGenre(genre, ctx, totalHeight, yOffset, rectWidth, alpha);
             }
 
 
-            const xCoor = playlistIndex * rectWidth;
-            const yCoor = genre.playlists[playlistIndex].percentage * totalHeight;
+            if (i === 3) {
+              const genre = this.genresCoordinates[this.genreKeys[targetIndex]];
 
+              yOffset = this.renderGenre(genre, ctx, totalHeight, yOffset, rectWidth, 1);
+            }
+          } else {
+            const genre = this.genresCoordinates[this.genreKeys[i]];
 
-            ctx.beginPath();
-            ctx.rect(xCoor, yOffset[playlistIndex], rectWidth, yCoor);
-            ctx.fill();
-
-
-            yOffset[playlistIndex] += yCoor;
-
-
+            yOffset = this.renderGenre(genre, ctx, totalHeight, yOffset, rectWidth, alpha);
           }
 
 
         }
 
+
+      },
+      renderGenre: function (genre, ctx, totalHeight, yOffset, rectWidth, alpha = 1) {
+
+        const color = genre['style']['rgb']['color'];
+        const rgba = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha + ')';
+
+        ctx.fillStyle = rgba;
+
+        for (let playlistPoint in genre.playlists) {
+          const playlistIndex = parseInt(playlistPoint);
+
+          if (typeof yOffset[playlistIndex] === 'undefined') {
+            yOffset[playlistIndex] = 0;
+          }
+
+
+          const xCoor = playlistIndex * rectWidth;
+          const yCoor = genre.playlists[playlistIndex].percentage * totalHeight;
+
+
+          ctx.beginPath();
+          ctx.rect(xCoor, yOffset[playlistIndex], rectWidth, yCoor);
+          ctx.fill();
+
+
+          yOffset[playlistIndex] += yCoor;
+
+
+        }
+
+
+        return yOffset;
       }
     },
     filters: {}
@@ -199,7 +239,6 @@
     &_genreList {
       list-style: none;
       padding: 0;
-
 
 
       li {
