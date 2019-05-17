@@ -137,12 +137,9 @@
 
         let highlightGenreFlag = false;
         let targetIndex = 0;
-        let maxLoopCount = 0;
 
         if (this.targetGenre !== '') {
           highlightGenreFlag = true;
-          maxLoopCount = Math.floor(this.genresCoordinatesLength / 2);
-
 
           for (let genreKey in this.genreKeys) {
             if (this.genreKeys[genreKey] === this.targetGenre) {
