@@ -19,7 +19,6 @@
 
       <div
         v-for="song in searchList"
-        v-bind:key="song.trackID"
         class="songItem col-12 col-md-6 col-lg-3"
         trackID="song.trackID">
 
@@ -240,7 +239,9 @@
     }
 
 
+    &_name {
 
+    }
 
     &_artist {
       cursor: pointer;
