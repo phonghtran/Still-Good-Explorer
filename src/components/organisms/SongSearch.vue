@@ -1,70 +1,77 @@
 <template>
   <div>
-
     <div class=" d-flex flex-wrap">
       <div class="search_wrapper col-12">
         <input
           v-model="filteredSongs"
           class="search_textBox"
           placeholder="Search..."
-          v-bind:style="{'background-color':  searchColor['hex']['tint'], 'border-color': searchColor['hex']['color'] }"
-          type="text">
+          v-bind:style="{
+            'background-color': searchColor['hex']['tint'],
+            'border-color': searchColor['hex']['color']
+          }"
+          type="text"
+        />
       </div>
 
       <div class="col-12">
-        <h2>{{totalResults}} Songs</h2>
-
+        <h2>{{ totalResults }} Songs</h2>
       </div>
-
 
       <div
         v-for="song in searchList"
+        v-bind:key="song.trackID"
         class="songItem col-12 col-md-6 col-lg-3"
-        trackID="song.trackID">
-
-        <div class="songItem_contents"
-             v-bind:style="{'background': generateLinearGradient(songStyle[song.trackID]), 'border': '2px solid ' + songStyle[song.trackID]['hex']['color'] }">
-
+        trackID="song.trackID"
+      >
+        <div
+          class="songItem_contents"
+          v-bind:style="{
+            background: generateLinearGradient(songStyle[song.trackID]),
+            border: '2px solid ' + songStyle[song.trackID]['hex']['color']
+          }"
+        >
           <div class="songItem_header">
             <h1
               class="songItem_name"
-              v-bind:style="{'background': songStyle[song.trackID]['hex']['shade']}">
-              {{song.name |decodeASCII}}
+              v-bind:style="{
+                background: songStyle[song.trackID]['hex']['shade']
+              }"
+            >
+              {{ song.name | decodeASCII }}
             </h1>
-            <br>
+            <br />
             <h2
               class="songItem_artist"
-              v-bind:style="{'background': songStyle[song.trackID]['hex']['color']}"
-              @click="setSearch(song.artist)">
-              {{song.artist |decodeASCII}}
+              v-bind:style="{
+                background: songStyle[song.trackID]['hex']['color']
+              }"
+              @click="setSearch(song.artist)"
+            >
+              {{ song.artist | decodeASCII }}
             </h2>
-            <br>
+            <br />
             <h4
               v-if="song.genre.length > 0"
               class="songItem_genre"
-              v-bind:style="{'background': songStyle[song.trackID]['hex']['color']}"
-              @click="setSearch(song.genre)">
-              {{song.genre | decodeASCII}}
+              v-bind:style="{
+                background: songStyle[song.trackID]['hex']['color']
+              }"
+              @click="setSearch(song.genre)"
+            >
+              {{ song.genre | decodeASCII }}
             </h4>
-
           </div>
-
 
           <playlist-appearances-list
             v-bind:song="song"
             v-bind:durationsObject="durationCalculation[song.trackID]"
             v-bind:colors="songStyle[song.trackID]"
           >
-
           </playlist-appearances-list>
-
-
         </div>
-
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -73,46 +80,36 @@
   import { colorMixin } from "../../mixins/colorMixin";
   import { stringMixin } from "../../mixins/stringMixin";
   import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList";
-  import _ from 'lodash';
+  import _ from "lodash";
 
   export default {
-    name: 'SongSearch',
-    components: {PlaylistAppearancesList},
+    name: "SongSearch",
+    components: { PlaylistAppearancesList },
     props: {},
     data() {
       return {
-        searchTerm: '',
+        searchTerm: "",
         searchList: []
       };
     },
-    mixins: [
-      colorMixin,
-      stringMixin
-    ],
-    mounted: function () {
+    mixins: [colorMixin, stringMixin],
+    mounted: function() {
       // this.searchList = this.songsAsArray;
     },
     computed: {
-      ...mapState([
-        'songs',
-        'playlists',
-        'songByAppearances'
-      ]),
-      ...mapGetters([
-        'durationCalculation',
-        'songsAsArray'
-      ]),
-      searchColor: function () {
+      ...mapState(["songs", "playlists", "songByAppearances"]),
+      ...mapGetters(["durationCalculation", "songsAsArray"]),
+      searchColor: function() {
         return this.generateColor(0.2);
       },
       filteredSongs: {
-        get: function () {
+        get: function() {
           return this.searchTerm;
         },
-        set: _.debounce(function (newSearchTerm) {
+        set: _.debounce(function(newSearchTerm) {
           this.searchTerm = newSearchTerm;
 
-          this.searchList =  this.songsAsArray.filter(post => {
+          this.searchList = this.songsAsArray.filter(post => {
             const keys = Object.keys(post);
             const searchFor = this.searchTerm.toLowerCase().trim();
             let haystack;
@@ -122,13 +119,12 @@
             for (let key in keys) {
               haystack = post[keys[key]];
 
-
-              if (typeof haystack === 'string') {
+              if (typeof haystack === "string") {
                 if (haystack.toLowerCase().includes(searchFor)) {
                   isMatch = true;
                   break;
                 } // is match
-              } else if (keys[key] === 'playlists') {
+              } else if (keys[key] === "playlists") {
                 const keysPlaylist = Object.keys(haystack);
 
                 for (let pl in keysPlaylist) {
@@ -141,39 +137,34 @@
                 if (isMatch === true) {
                   break;
                 }
-              }// is string or object
-
+              } // is string or object
             } // loop all items
             return isMatch;
           }); // filter
 
           this.userIsTyping = false;
         }, 350)
-      }
+      },
 
-      ,
-      totalResults: function () {
-
-        if (typeof this.searchList !== 'undefined') {
+      totalResults: function() {
+        if (typeof this.searchList !== "undefined") {
           return this.searchList.length;
         }
 
         return 0;
       },
-      songStyle: function () {
+      songStyle: function() {
         let newArray = {};
 
         for (let song in this.songs) {
-
           newArray[song] = this.generateColor();
-
         }
 
         return newArray;
       }
     },
     methods: {
-      setSearch: function (term) {
+      setSearch: function(term) {
         window.scrollTo(0, 0);
         this.filteredSongs = term;
       }
@@ -191,7 +182,7 @@
       margin-bottom: map_get($spacers, 4);
       position: sticky;
       position: -webkit-sticky;
-      top:  map_get($spacers, 6);
+      top: map_get($spacers, 6);
       z-index: $zindex-sticky;
     }
 
@@ -236,11 +227,6 @@
         padding: map_get($spacers, 1) map_get($spacers, 2);
         margin-bottom: 0;
       }
-    }
-
-
-    &_name {
-
     }
 
     &_artist {
