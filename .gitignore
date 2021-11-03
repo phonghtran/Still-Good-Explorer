@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .idea/.2019-04-01 - Still Good Explorer.iml.icloud
 .idea/.misc.xml.icloud
 .idea/.modules.xml.icloud
@@ -8,3 +9,26 @@
 .idea/dictionaries/.phongtran.xml.icloud
 .idea/inspectionProfiles/.Project_Default.xml.icloud
 .idea/
+=======
+.DS_Store
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+>>>>>>> origin/master

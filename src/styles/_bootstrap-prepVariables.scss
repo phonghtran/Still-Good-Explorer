@@ -1,0 +1,30 @@
+// origin: bootstrap-grid
+
+html {
+  box-sizing: border-box;
+  -ms-overflow-style: scrollbar;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+$border-radius: 0.5rem;
+
+$spacer: 1rem !default;
+$spacers: () !default;
+$spacers: map-merge(
+                (
+                        6: ($spacer * 5),
+                        7: ($spacer * 7),
+                ),
+                $spacers
+);
+// Helper function
+@function space($key: 0) {
+  @return map-get($spacers, $key);
+}
+
+
