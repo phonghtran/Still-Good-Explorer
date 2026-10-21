@@ -1,16 +1,12 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import Playlists from './views/Playlists.vue';
 import Stats from './views/Stats.vue';
 import Songs from './views/Songs.vue';
 import Home from './views/Home.vue';
 import Genres from './views/Genres.vue';
 
-Vue.use(Router);
-
-const router = new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',

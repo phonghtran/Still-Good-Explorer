@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import NavMain from "./components/molecules/NavMain";
+  import NavMain from "./components/molecules/NavMain.vue";
   export default {
     components: {NavMain}
   };

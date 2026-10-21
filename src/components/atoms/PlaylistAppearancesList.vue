@@ -13,15 +13,13 @@
         <template v-if="item.finalDate">
           <a
             class="infoPanel_listItemLink"
-            v-on:click.prevent="jumpToPlaylist(item.finalDate)">{{item.finalDate |
-              truncateYear(item.initialDate)}}</a>
+            v-on:click.prevent="jumpToPlaylist(item.finalDate)">{{truncateYear(item.finalDate, item.initialDate)}}</a>
 
           &ndash;
         </template>
         <a
           class="infoPanel_listItemLink"
-          v-on:click.prevent="jumpToPlaylist(item.initialDate)">{{item.initialDate |
-            truncateMonth(item.finalDate)}}</a>
+          v-on:click.prevent="jumpToPlaylist(item.initialDate)">{{truncateMonth(item.initialDate, item.finalDate)}}</a>
 
       </p>
       <br>

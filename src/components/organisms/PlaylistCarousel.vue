@@ -16,7 +16,7 @@
     <div class="playlistCarousel_playlistContainer d-flex align-items-start">
       <div v-for="(playlist, key) in playlists" v-bind:date="key" class="playlistCarousel_playlist">
 
-        <h4>{{key | moment("MMMM Do, YYYY")}}</h4>
+        <h4>{{formatDate(key, "MMMM Do, YYYY")}}</h4>
 
 
         <ol
@@ -52,9 +52,9 @@
 <script>
   import { mapGetters, mapState } from "vuex";
   import moment from 'moment/moment';
-  import SongInfoPanel from "../molecules/SongInfoPanel";
+  import SongInfoPanel from "../molecules/SongInfoPanel.vue";
   import { colorMixin } from "../../mixins/colorMixin";
-  import PlaylistTimeline from "../molecules/PlaylistTimeline";
+  import PlaylistTimeline from "../molecules/PlaylistTimeline.vue";
 
   export default {
     name: 'PlaylistCarousel',
@@ -157,11 +157,14 @@
       window.addEventListener('scroll', this.handleScroll );
 
     },
-    destroyed: function () {
+    unmounted: function () {
       window.removeEventListener('scroll', this.handleScroll);
     },
     mixins: [colorMixin],
     methods: {
+      formatDate(date, format) {
+        return moment(date).format(format);
+      },
       scrollTo(targetDate) {
         const playlists = document.querySelectorAll('.playlistCarousel_playlist');
 
@@ -230,9 +233,9 @@
               target: this.playlistStyle[compareToPlaylist.getAttribute('date')]
             };
 
-            if (currentPlaylist.childNodes[1].hasChildNodes() && compareToPlaylist.childNodes[1].hasChildNodes()) {
-              const currentChildren = currentPlaylist.childNodes[1].childNodes;
-              const compareToChildren = compareToPlaylist.childNodes[1].childNodes;
+            if (currentPlaylist.children[1].hasChildNodes() && compareToPlaylist.children[1].hasChildNodes()) {
+              const currentChildren = currentPlaylist.children[1].children;
+              const compareToChildren = compareToPlaylist.children[1].children;
 
               for (let currentMatch in checkMatches) {
                 const magicPadding = {
@@ -298,7 +301,6 @@
       }
     }
     ,
-    filters: {}
   }
   ;
 </script>
@@ -400,7 +402,7 @@
   .slide-enter-active, .slide-leave-active {
     transition: max-width 500ms;
   }
-  .slide-enter, .slide-leave-to  {
+  .slide-enter-from, .slide-leave-to  {
     max-width: 0;
   }
 

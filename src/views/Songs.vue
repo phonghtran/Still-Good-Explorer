@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import SongSearch from "../components/organisms/SongSearch";
+import SongSearch from "../components/organisms/SongSearch.vue";
 
 export default {
 
