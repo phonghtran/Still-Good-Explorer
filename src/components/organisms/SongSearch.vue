@@ -38,7 +38,7 @@
                 background: songStyle[song.trackID]['hex']['shade']
               }"
             >
-              {{ song.name | decodeASCII }}
+              {{ decodeASCII(song.name) }}
             </h1>
             <br />
             <h2
@@ -48,7 +48,7 @@
               }"
               @click="setSearch(song.artist)"
             >
-              {{ song.artist | decodeASCII }}
+              {{ decodeASCII(song.artist) }}
             </h2>
             <br />
             <h4
@@ -59,7 +59,7 @@
               }"
               @click="setSearch(song.genre)"
             >
-              {{ song.genre | decodeASCII }}
+              {{ decodeASCII(song.genre) }}
             </h4>
           </div>
 
@@ -79,7 +79,7 @@
   import { mapGetters, mapState } from "vuex";
   import { colorMixin } from "../../mixins/colorMixin";
   import { stringMixin } from "../../mixins/stringMixin";
-  import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList";
+  import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList.vue";
   import _ from "lodash";
 
   export default {
@@ -169,7 +169,6 @@
         this.filteredSongs = term;
       }
     },
-    filters: {}
   };
 </script>
 

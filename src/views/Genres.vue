@@ -8,7 +8,7 @@
 
 <script>
 // @ is an alias to /src
-import GenreChart from '../components/organisms/GenreChart';
+import GenreChart from '../components/organisms/GenreChart.vue';
 
 export default {
 

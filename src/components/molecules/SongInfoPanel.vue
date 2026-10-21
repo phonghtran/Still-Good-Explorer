@@ -39,7 +39,7 @@
   import { mapState, mapGetters } from "vuex";
   import { colorMixin } from "../../mixins/colorMixin";
   import { stringMixin } from "../../mixins/stringMixin";
-  import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList";
+  import PlaylistAppearancesList from "../atoms/PlaylistAppearancesList.vue";
 
   export default {
     name: 'SongInfoPanel',

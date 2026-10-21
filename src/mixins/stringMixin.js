@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export const stringMixin = {
-  filters: {
+  methods: {
     truncateYear: function (iniitialDate, compareDate) {
       if (moment(iniitialDate).format('YYYY') === moment(compareDate).format('YYYY')) {
         return moment(iniitialDate).format("MMM D");

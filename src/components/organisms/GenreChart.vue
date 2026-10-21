@@ -211,7 +211,6 @@
         return yOffset;
       }
     },
-    filters: {}
   };
 </script>
 

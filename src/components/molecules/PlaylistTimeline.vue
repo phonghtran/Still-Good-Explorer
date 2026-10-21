@@ -7,7 +7,7 @@
         v-for="button in buttonDates"
         class="buttonYear"
         @click="scrollTo(button)">
-        {{button | ageFormat }}
+        {{ ageFormat(button) }}
       </button>
 
     </div>
@@ -44,9 +44,7 @@
       },
       toggleOpen: function () {
         this.isOpen = !this.isOpen;
-      }
-    },
-    filters: {
+      },
       ageFormat: function (val) {
         let prefix = '';
         let suffix = '';
